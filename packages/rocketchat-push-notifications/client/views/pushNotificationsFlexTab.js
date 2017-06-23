@@ -1,8 +1,42 @@
+import toastr from 'toastr';
 /* globals ChatSubscription */
 
 Template.pushNotificationsFlexTab.helpers({
+	audioAssets() {
+		return RocketChat.CustomSounds && RocketChat.CustomSounds.getList && RocketChat.CustomSounds.getList() || [];
+	},
+	audioNotification() {
+		const sub = ChatSubscription.findOne({
+			rid: Session.get('openedRoom')
+		}, {
+			fields: {
+				audioNotification: 1
+			}
+		});
+		return sub ? sub.audioNotification || '' : '';
+	},
+	disableNotifications() {
+		const sub = ChatSubscription.findOne({
+			rid: Session.get('openedRoom')
+		}, {
+			fields: {
+				disableNotifications: 1
+			}
+		});
+		return sub ? sub.disableNotifications || false : false;
+	},
+	hideUnreadStatus() {
+		const sub = ChatSubscription.findOne({
+			rid: Session.get('openedRoom')
+		}, {
+			fields: {
+				hideUnreadStatus: 1
+			}
+		});
+		return sub ? sub.hideUnreadStatus || false : false;
+	},
 	desktopNotifications() {
-		var sub = ChatSubscription.findOne({
+		const sub = ChatSubscription.findOne({
 			rid: Session.get('openedRoom')
 		}, {
 			fields: {
@@ -12,7 +46,7 @@ Template.pushNotificationsFlexTab.helpers({
 		return sub ? sub.desktopNotifications : '';
 	},
 	mobilePushNotifications() {
-		var sub = ChatSubscription.findOne({
+		const sub = ChatSubscription.findOne({
 			rid: Session.get('openedRoom')
 		}, {
 			fields: {
@@ -22,7 +56,7 @@ Template.pushNotificationsFlexTab.helpers({
 		return sub ? sub.mobilePushNotifications : '';
 	},
 	emailNotifications() {
-		var sub = ChatSubscription.findOne({
+		const sub = ChatSubscription.findOne({
 			rid: Session.get('openedRoom')
 		}, {
 			fields: {
@@ -32,7 +66,7 @@ Template.pushNotificationsFlexTab.helpers({
 		return sub ? sub.emailNotifications : '';
 	},
 	showEmailMentions() {
-		var sub = ChatSubscription.findOne({
+		const sub = ChatSubscription.findOne({
 			rid: Session.get('openedRoom')
 		}, {
 			fields: {
@@ -42,7 +76,7 @@ Template.pushNotificationsFlexTab.helpers({
 		return sub && sub.t !== 'd';
 	},
 	unreadAlert() {
-		var sub = ChatSubscription.findOne({
+		const sub = ChatSubscription.findOne({
 			rid: Session.get('openedRoom')
 		}, {
 			fields: {
@@ -52,7 +86,7 @@ Template.pushNotificationsFlexTab.helpers({
 		return sub ? sub.unreadAlert : 'default';
 	},
 	unreadAlertText() {
-		var sub = ChatSubscription.findOne({
+		const sub = ChatSubscription.findOne({
 			rid: Session.get('openedRoom')
 		}, {
 			fields: {
@@ -69,8 +103,29 @@ Template.pushNotificationsFlexTab.helpers({
 		}
 		return t('Use_account_preference');
 	},
+	audioValue() {
+		const sub = ChatSubscription.findOne({
+			rid: Session.get('openedRoom')
+		}, {
+			fields: {
+				audioNotification: 1
+			}
+		});
+		const audio = sub ? sub.audioNotification || '': '';
+		if (audio === 'none') {
+			return t('None');
+		} else if (audio === '') {
+			return t('Use_account_preference');
+		} else if (audio === 'chime') {
+			return 'Chime';
+		} else {
+			const audioAssets = RocketChat.CustomSounds && RocketChat.CustomSounds.getList && RocketChat.CustomSounds.getList() || [];
+			const asset = _.findWhere(audioAssets, { _id: audio });
+			return asset && asset.name;
+		}
+	},
 	subValue(field) {
-		var sub = ChatSubscription.findOne({
+		const sub = ChatSubscription.findOne({
 			rid: Session.get('openedRoom')
 		}, {
 			fields: {
@@ -123,17 +178,36 @@ Template.pushNotificationsFlexTab.onCreated(function() {
 	this.editing = new ReactiveVar();
 
 	this.validateSetting = (field) => {
-		const value = this.$('input[name='+ field +']:checked').val();
-		if (['all', 'mentions', 'nothing', 'default'].indexOf(value) === -1) {
-			toastr.error(t('Invalid_notification_setting_s', value || ''));
-			return false;
+		switch (field) {
+			case 'audioNotification':
+			case 'hideUnreadStatus':
+			case 'disableNotifications':
+				return true;
+			default:
+				const value = this.$(`input[name=${ field }]:checked`).val();
+				if (['all', 'mentions', 'nothing', 'default'].indexOf(value) === -1) {
+					toastr.error(t('Invalid_notification_setting_s', value || ''));
+					return false;
+				}
+				return true;
 		}
-		return true;
 	};
 
 	this.saveSetting = () => {
 		const field = this.editing.get();
-		const value = this.$('input[name='+ field +']:checked').val();
+		let value;
+		switch (field) {
+			case 'audioNotification':
+				value = this.$(`select[name=${ field }]`).val();
+				break;
+			case 'hideUnreadStatus':
+			case 'disableNotifications':
+				value = this.$(`input[name=${ field }]:checked`).val() ? '1' : '0';
+				break;
+			default:
+				value = this.$(`input[name=${ field }]:checked`).val();
+				break;
+		}
 		const duration = $('input[name=duration]').val();
 		if (this.validateSetting(field)) {
 			Meteor.call('saveNotificationSettings', Session.get('openedRoom'), field, value, (err/*, result*/) => {
@@ -176,6 +250,42 @@ Template.pushNotificationsFlexTab.events({
 
 	'click .save'(e, instance) {
 		e.preventDefault();
+		instance.saveSetting();
+	},
+
+	'click [data-play]'(e) {
+		e.preventDefault();
+		let audio = $(e.currentTarget).data('play');
+		if (audio && audio !== 'none') {
+			const $audio = $(`audio#${ audio }`);
+			if ($audio && $audio[0] && $audio[0].play) {
+				$audio[0].play();
+			}
+		} else {
+			audio = Meteor.user() && Meteor.user().settings && Meteor.user().settings.preferences && Meteor.user().settings.preferences.newMessageNotification || 'chime';
+			if (audio && audio !== 'none') {
+				const $audio = $(`audio#${ audio }`);
+				if ($audio && $audio[0] && $audio[0].play) {
+					$audio[0].play();
+				}
+			}
+		}
+	},
+
+	'change select[name=audioNotification]'(e) {
+		e.preventDefault();
+		const audio = $(e.currentTarget).val();
+		if (audio && audio !== 'none') {
+			const $audio = $(`audio#${ audio }`);
+			if ($audio && $audio[0] && $audio[0].play) {
+				$audio[0].play();
+			}
+		}
+	},
+
+	'change input[type=checkbox]'(e, instance) {
+		e.preventDefault();
+		instance.editing.set($(e.currentTarget).attr('name'));
 		instance.saveSetting();
 	}
 });

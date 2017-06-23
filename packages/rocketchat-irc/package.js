@@ -12,14 +12,14 @@ Npm.depends({
 
 Package.onUse(function(api) {
 	api.use([
-		'coffeescript',
+		'ecmascript',
 		'underscore',
 		'rocketchat:lib'
 	]);
 
 	api.addFiles([
 		'server/settings.js',
-		'server/server.coffee'
+		'server/server.js'
 	], 'server');
 
 	api.export(['Irc'], ['server']);

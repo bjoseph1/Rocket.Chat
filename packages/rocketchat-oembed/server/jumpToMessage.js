@@ -11,14 +11,16 @@ RocketChat.callbacks.add('beforeSaveMessage', (msg) => {
 				if (urlObj.query) {
 					const queryString = QueryString.parse(urlObj.query);
 					if (_.isString(queryString.msg)) { // Jump-to query param
-						let jumpToMessage = RocketChat.models.Messages.findOneById(queryString.msg);
+						const jumpToMessage = RocketChat.models.Messages.findOneById(queryString.msg);
 						if (jumpToMessage) {
 							msg.attachments = msg.attachments || [];
 							msg.attachments.push({
 								'text' : jumpToMessage.msg,
-								'author_name' : jumpToMessage.u.username,
+								'translations': jumpToMessage.translations,
+								'author_name' : jumpToMessage.alias || jumpToMessage.u.username,
 								'author_icon' : getAvatarUrlFromUsername(jumpToMessage.u.username),
 								'message_link' : item.url,
+								'attachments' : jumpToMessage.attachments || [],
 								'ts': jumpToMessage.ts
 							});
 							item.ignoreParse = true;
