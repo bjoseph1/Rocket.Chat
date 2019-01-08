@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-
 Meteor.publish('fullUserData', function(filter, limit) {
 	if (!this.userId) {
 		return this.ready();
@@ -8,7 +6,7 @@ Meteor.publish('fullUserData', function(filter, limit) {
 	const result = RocketChat.getFullUserData({
 		userId: this.userId,
 		filter,
-		limit,
+		limit
 	});
 
 	if (!result) {

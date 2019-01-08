@@ -1,7 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 Meteor.startup(function() {
 	Tracker.autorun(function() {
 		if (RocketChat.settings.get('OTR_Enable') && window.crypto) {
@@ -13,7 +9,7 @@ Meteor.startup(function() {
 				i18nTitle: 'OTR',
 				icon: 'key',
 				template: 'otrFlexTab',
-				order: 11,
+				order: 11
 			});
 		} else {
 			RocketChat.OTR.enabled.set(false);

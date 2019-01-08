@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { Session } from 'meteor/session';
 import _ from 'underscore';
 
 /* DEFINITIONS
@@ -15,7 +13,7 @@ import _ from 'underscore';
 // window.addEventListener 'focus', ->
 // readMessage.refreshUnreadMark(undefined, true)
 
-readMessage = new class {
+const readMessage = new class {
 	constructor() {
 		this.debug = false;
 		this.callbacks = [];
@@ -52,7 +50,7 @@ readMessage = new class {
 			});
 		}
 
-		const subscription = ChatSubscription.findOne({ rid });
+		const subscription = ChatSubscription.findOne({rid});
 		if (subscription == null) {
 			if (this.debug) { console.log('readMessage -> readNow canceled, no subscription found for rid:', rid); }
 			return;
@@ -117,7 +115,7 @@ readMessage = new class {
 			return;
 		}
 
-		const subscription = ChatSubscription.findOne({ rid }, { reactive: false });
+		const subscription = ChatSubscription.findOne({rid}, {reactive: false});
 		if (subscription == null) {
 			return;
 		}
@@ -140,17 +138,21 @@ readMessage = new class {
 		let lastReadRecord = ChatMessage.findOne({
 			rid: subscription.rid,
 			ts: {
-				$lt: subscription.ls,
-			},
-		}, {
+				$lt: subscription.ls
+			}
+		}
+			// 'u._id':
+			// 	$ne: Meteor.userId()
+			, {
 			sort: {
-				ts: -1,
-			},
-		});
+				ts: -1
+			}
+		}
+		);
 
 		if ((lastReadRecord == null) && (RoomHistoryManager.getRoom(room.rid).unreadNotLoaded.get() === 0)) {
 			lastReadRecord =
-				{ ts: new Date(0) };
+				{ts: new Date(0)};
 		}
 
 		if ((lastReadRecord != null) || (RoomHistoryManager.getRoom(room.rid).unreadNotLoaded.get() > 0)) {
@@ -163,16 +165,18 @@ readMessage = new class {
 			const firstUnreadRecord = ChatMessage.findOne({
 				rid: subscription.rid,
 				ts: {
-					$gt: lastReadRecord.ts,
+					$gt: lastReadRecord.ts
 				},
 				'u._id': {
-					$ne: Meteor.userId(),
-				},
-			}, {
+					$ne: Meteor.userId()
+				}
+			}
+				, {
 				sort: {
-					ts: 1,
-				},
-			});
+					ts: 1
+				}
+			}
+			);
 
 			if (firstUnreadRecord != null) {
 				room.unreadFirstId = firstUnreadRecord._id;
@@ -211,3 +215,5 @@ Meteor.startup(function() {
 		}
 	});
 });
+export { readMessage };
+this.readMessage = readMessage;

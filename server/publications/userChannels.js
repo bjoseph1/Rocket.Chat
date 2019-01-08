@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-
 Meteor.publish('userChannels', function(userId) {
 	if (!this.userId) {
 		return this.ready();
@@ -14,11 +12,11 @@ Meteor.publish('userChannels', function(userId) {
 			rid: 1,
 			name: 1,
 			t: 1,
-			u: 1,
+			u: 1
 		},
 		sort: {
 			t: 1,
-			name: 1,
-		},
+			name: 1
+		}
 	});
 });

@@ -1,4 +1,4 @@
 import { Importers } from 'meteor/rocketchat:importer';
-import { SlackUsersImporterInfo } from '../lib/info';
+import { SlackUsersImporterInfo } from '../info';
 
 Importers.add(new SlackUsersImporterInfo());

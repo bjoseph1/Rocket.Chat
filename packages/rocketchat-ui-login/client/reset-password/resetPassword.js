@@ -1,12 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { Accounts } from 'meteor/accounts-base';
-import { FlowRouter } from 'meteor/kadira:flow-router';
-import { Template } from 'meteor/templating';
-import { modal } from 'meteor/rocketchat:ui';
-import { t } from 'meteor/rocketchat:utils';
-import { RocketChat } from 'meteor/rocketchat:lib';
 import toastr from 'toastr';
-
 Template.resetPassword.helpers({
 	requirePasswordChange() {
 		const user = Meteor.user();
@@ -19,7 +11,7 @@ Template.resetPassword.helpers({
 		if (user) {
 			return user.requirePasswordChangeReason;
 		}
-	},
+	}
 });
 
 Template.resetPassword.events({
@@ -37,13 +29,13 @@ Template.resetPassword.events({
 		const button = instance.$('button.resetpass');
 		RocketChat.Button.loading(button);
 
-		if (Meteor.userId() && !FlowRouter.getParam('token')) {
+		if (Meteor.userId()) {
 			Meteor.call('setUserPassword', instance.find('[name=newPassword]').value, function(error) {
 				if (error) {
 					console.log(error);
 					modal.open({
 						title: t('Error_changing_password'),
-						type: 'error',
+						type: 'error'
 					});
 				}
 			});
@@ -59,7 +51,7 @@ Template.resetPassword.events({
 					} else {
 						modal.open({
 							title: t('Error_changing_password'),
-							type: 'error',
+							type: 'error'
 						});
 					}
 				} else {
@@ -69,7 +61,7 @@ Template.resetPassword.events({
 				}
 			});
 		}
-	},
+	}
 });
 
 Template.resetPassword.onRendered(function() {

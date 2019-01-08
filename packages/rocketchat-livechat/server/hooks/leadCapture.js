@@ -1,4 +1,3 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
 import LivechatVisitors from '../../server/models/LivechatVisitors';
 
 function validateMessage(message, room) {

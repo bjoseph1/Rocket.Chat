@@ -1,4 +1,3 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
 import s from 'underscore.string';
 
 //
@@ -18,4 +17,4 @@ function HexColorPreview(message) {
 	return message;
 }
 
-RocketChat.callbacks.add('renderMessage', HexColorPreview, RocketChat.callbacks.priority.MEDIUM, 'hexcolor');
+RocketChat.callbacks.add('renderMessage', HexColorPreview, RocketChat.callbacks.priority.MEDIUM);

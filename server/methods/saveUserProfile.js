@@ -1,21 +1,16 @@
-import { Meteor } from 'meteor/meteor';
-import { Match, check } from 'meteor/check';
-import { Accounts } from 'meteor/accounts-base';
-
 Meteor.methods({
 	saveUserProfile(settings, customFields) {
 		check(settings, Object);
-		check(customFields, Match.Maybe(Object));
 
 		if (!RocketChat.settings.get('Accounts_AllowUserProfileChange')) {
 			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
-				method: 'saveUserProfile',
+				method: 'saveUserProfile'
 			});
 		}
 
 		if (!Meteor.userId()) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-				method: 'saveUserProfile',
+				method: 'saveUserProfile'
 			});
 		}
 
@@ -28,7 +23,7 @@ Meteor.methods({
 
 			const passCheck = Accounts._checkPassword(user, {
 				digest: typedPassword,
-				algorithm: 'sha-256',
+				algorithm: 'sha-256'
 			});
 
 			if (passCheck.error) {
@@ -38,7 +33,7 @@ Meteor.methods({
 		}
 
 		if (settings.realname) {
-			Meteor.call('setRealName', settings.realname);
+			RocketChat.setRealName(Meteor.userId(), settings.realname);
 		}
 
 		if (settings.username) {
@@ -48,7 +43,7 @@ Meteor.methods({
 		if (settings.email) {
 			if (!checkPassword(user, settings.typedPassword)) {
 				throw new Meteor.Error('error-invalid-password', 'Invalid password', {
-					method: 'saveUserProfile',
+					method: 'saveUserProfile'
 				});
 			}
 
@@ -59,23 +54,19 @@ Meteor.methods({
 		if ((settings.newPassword) && RocketChat.settings.get('Accounts_AllowPasswordChange') === true) {
 			if (!checkPassword(user, settings.typedPassword)) {
 				throw new Meteor.Error('error-invalid-password', 'Invalid password', {
-					method: 'saveUserProfile',
+					method: 'saveUserProfile'
 				});
 			}
 
-			RocketChat.passwordPolicy.validate(settings.newPassword);
-
 			Accounts.setPassword(Meteor.userId(), settings.newPassword, {
-				logout: false,
+				logout: false
 			});
 		}
 
 		RocketChat.models.Users.setProfile(Meteor.userId(), {});
 
-		if (customFields && Object.keys(customFields).length) {
-			RocketChat.saveCustomFields(Meteor.userId(), customFields);
-		}
+		RocketChat.saveCustomFields(Meteor.userId(), customFields);
 
 		return true;
-	},
+	}
 });

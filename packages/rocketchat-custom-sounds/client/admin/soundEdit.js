@@ -1,8 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { Template } from 'meteor/templating';
-import { TAPi18n } from 'meteor/tap:i18n';
-import { t } from 'meteor/rocketchat:utils';
-import { handleError } from 'meteor/rocketchat:lib';
 import toastr from 'toastr';
 import s from 'underscore.string';
 
@@ -13,7 +8,7 @@ Template.soundEdit.helpers({
 
 	name() {
 		return this.name || this._id;
-	},
+	}
 });
 
 Template.soundEdit.events({
@@ -32,7 +27,7 @@ Template.soundEdit.events({
 
 	'change input[type=file]'(ev) {
 		const e = (ev.originalEvent != null) ? ev.originalEvent : ev;
-		let { files } = e.target;
+		let files = e.target.files;
 		if (e.target.files == null || files.length === 0) {
 			if (e.dataTransfer.files != null) {
 				files = e.dataTransfer.files;
@@ -41,13 +36,13 @@ Template.soundEdit.events({
 			}
 		}
 
-		// using let x of y here seems to have incompatibility with some phones
+		//using let x of y here seems to have incompatibility with some phones
 		for (const file in files) {
 			if (files.hasOwnProperty(file)) {
 				Template.instance().soundFile = files[file];
 			}
 		}
-	},
+	}
 });
 
 Template.soundEdit.onCreated(function() {
@@ -98,7 +93,7 @@ Template.soundEdit.onCreated(function() {
 		}
 
 		if (this.soundFile) {
-			if (!/audio\/mp3/.test(this.soundFile.type) && !/audio\/mpeg/.test(this.soundFile.type) && !/audio\/x-mpeg/.test(this.soundFile.type)) {
+			if (!/audio\/mp3/.test(this.soundFile.type)) {
 				errors.push('FileType');
 				toastr.error(TAPi18n.__('error-invalid-file-type'));
 			}
@@ -128,7 +123,7 @@ Template.soundEdit.onCreated(function() {
 						const reader = new FileReader();
 						reader.readAsBinaryString(this.soundFile);
 						reader.onloadend = () => {
-							Meteor.call('uploadCustomSound', reader.result, this.soundFile.type, soundData, (uploadError/* , data*/) => {
+							Meteor.call('uploadCustomSound', reader.result, this.soundFile.type, soundData, (uploadError/*, data*/) => {
 								if (uploadError != null) {
 									handleError(uploadError);
 									console.log(uploadError);

@@ -1,6 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-import { importNewUsers } from './sync';
+import {importNewUsers} from './sync';
 
 Meteor.methods({
 	ldap_sync_now() {
@@ -23,7 +21,7 @@ Meteor.methods({
 
 		return {
 			message: 'Sync_in_progress',
-			params: [],
+			params: []
 		};
-	},
+	}
 });

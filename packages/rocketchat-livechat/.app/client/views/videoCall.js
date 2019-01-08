@@ -1,13 +1,11 @@
 /* globals LivechatVideoCall */
-import { ReactiveVar } from 'meteor/reactive-var';
-import { Template } from 'meteor/templating';
 
 Template.videoCall.helpers({
 	visible() {
 		if (Template.instance().showToolbar.get()) {
 			return 'visible';
 		}
-	},
+	}
 });
 
 Template.videoCall.events({
@@ -25,7 +23,7 @@ Template.videoCall.events({
 				instance.showToolbar.set(false);
 			}, 3000);
 		}
-	},
+	}
 });
 
 Template.videoCall.onCreated(function() {

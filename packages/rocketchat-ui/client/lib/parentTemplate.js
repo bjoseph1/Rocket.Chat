@@ -1,5 +1,3 @@
-import { Blaze } from 'meteor/blaze';
-
 /**
  * Get the parent template instance
  * @param {Number} [levels] How many levels to go up. Default is 1

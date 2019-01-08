@@ -1,7 +1,3 @@
-import { Template } from 'meteor/templating';
-import { RocketChat } from 'meteor/rocketchat:lib';
-import { ChatRoom } from 'meteor/rocketchat:ui';
-
 Template.room.helpers({
 	sentimentSmile() {
 		if (!RocketChat.settings.get('GoogleNaturalLanguage_Enabled')) {
@@ -17,5 +13,5 @@ Template.room.helpers({
 		} else if (room.sentiment < -0.3) {
 			return ':(';
 		}
-	},
+	}
 });

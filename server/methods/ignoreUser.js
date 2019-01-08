@@ -1,9 +1,7 @@
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
-import { RocketChat } from 'meteor/rocketchat:lib';
+/* globals RocketChat */
 
 Meteor.methods({
-	ignoreUser({ rid, userId: ignoredUser, ignore = true }) {
+	ignoreUser({rid, userId: ignoredUser, ignore = true}) {
 		check(ignoredUser, String);
 		check(rid, String);
 		check(ignore, Boolean);
@@ -11,7 +9,7 @@ Meteor.methods({
 		const userId = Meteor.userId();
 		if (!userId) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-				method: 'ignoreUser',
+				method: 'ignoreUser'
 			});
 		}
 
@@ -27,6 +25,6 @@ Meteor.methods({
 			throw new Meteor.Error('error-invalid-subscription', 'Invalid subscription', { method: 'ignoreUser' });
 		}
 
-		return !!RocketChat.models.Subscriptions.ignoreUser({ _id: subscription._id, ignoredUser, ignore });
-	},
+		return !!RocketChat.models.Subscriptions.ignoreUser({_id: subscription._id, ignoredUser, ignore});
+	}
 });

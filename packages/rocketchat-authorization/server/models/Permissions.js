@@ -1,14 +1,12 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 class ModelPermissions extends RocketChat.models._Base {
-	constructor(...args) {
-		super(...args);
+	constructor() {
+		super(...arguments);
 	}
 
 	// FIND
 	findByRole(role, options) {
 		const query = {
-			roles: role,
+			roles: role
 		};
 
 		return this.find(query, options);
@@ -31,4 +29,5 @@ class ModelPermissions extends RocketChat.models._Base {
 	}
 }
 
-RocketChat.models.Permissions = new ModelPermissions('permissions');
+RocketChat.models.Permissions = new ModelPermissions('permissions', true);
+RocketChat.models.Permissions.cache.load();

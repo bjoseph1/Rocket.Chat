@@ -2,34 +2,44 @@
 // customLdapOptions should be passed in if you want to override LDAP_DEFAULTS
 // on any particular call (if you have multiple ldap servers you'd like to connect to)
 // You'll likely want to set the dn value here {dn: "..."}
-import { Meteor } from 'meteor/meteor';
-import { Accounts } from 'meteor/accounts-base';
-
-Meteor.loginWithLDAP = function(...args) {
+Meteor.loginWithLDAP = function(username, password, customLdapOptions, callback) {
+	// Retrieve arguments as array
+	const args = [];
+	for (let i = 0; i < arguments.length; i++) {
+		args.push(arguments[i]);
+	}
 	// Pull username and password
-	const username = args.shift();
-	const password = args.shift();
+	username = args.shift();
+	password = args.shift();
 
 	// Check if last argument is a function
 	// if it is, pop it off and set callback to it
-	const callback = typeof args[args.length - 1] === 'function' ? args.pop() : null;
+	if (typeof args[args.length-1] === 'function') {
+		callback = args.pop();
+	} else {
+		callback = null;
+	}
 
 	// if args still holds options item, grab it
-	const customLdapOptions = args.length > 0 ? args.shift() : {};
+	if (args.length > 0) {
+		customLdapOptions = args.shift();
+	} else {
+		customLdapOptions = {};
+	}
 
 	// Set up loginRequest object
 	const loginRequest = {
 		ldap: true,
 		username,
 		ldapPass: password,
-		ldapOptions: customLdapOptions,
+		ldapOptions: customLdapOptions
 	};
 
 	Accounts.callLoginMethod({
 		// Call login method with ldap = true
 		// This will hook into our login handler for ldap
 		methodArguments: [loginRequest],
-		userCallback(error/* , result*/) {
+		userCallback(error/*, result*/) {
 			if (error) {
 				if (callback) {
 					callback(error);
@@ -37,6 +47,6 @@ Meteor.loginWithLDAP = function(...args) {
 			} else if (callback) {
 				callback();
 			}
-		},
+		}
 	});
 };

@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { Accounts } from 'meteor/accounts-base';
-
 Meteor.methods({
 	createToken(userId) {
 		if (Meteor.userId() !== userId && !RocketChat.authz.hasPermission(Meteor.userId(), 'user-generate-access-token')) {
@@ -10,7 +7,7 @@ Meteor.methods({
 		Accounts._insertLoginToken(userId, token);
 		return {
 			userId,
-			authToken: token.token,
+			authToken: token.token
 		};
-	},
+	}
 });

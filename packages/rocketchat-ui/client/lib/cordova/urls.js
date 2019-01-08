@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-
 Meteor.startup(() => {
 	if (!Meteor.isCordova) { return; }
 	// Handle click events for all external URLs

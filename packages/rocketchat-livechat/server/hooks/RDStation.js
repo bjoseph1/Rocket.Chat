@@ -1,6 +1,3 @@
-import { HTTP } from 'meteor/http';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 function sendToRDStation(room) {
 	if (!RocketChat.settings.get('Livechat_RDStation_Token')) {
 		return room;
@@ -12,18 +9,16 @@ function sendToRDStation(room) {
 		return room;
 	}
 
-	const email = Array.isArray(livechatData.visitor.email) ? livechatData.visitor.email[0].address : livechatData.visitor.email;
-
 	const options = {
 		headers: {
-			'Content-Type': 'application/json',
+			'Content-Type': 'application/json'
 		},
 		data: {
 			token_rdstation: RocketChat.settings.get('Livechat_RDStation_Token'),
 			identificador: 'rocketchat-livechat',
 			client_id: livechatData.visitor._id,
-			email,
-		},
+			email: livechatData.visitor.email
+		}
 	};
 
 	options.data.nome = livechatData.visitor.name || livechatData.visitor.username;
@@ -36,11 +31,11 @@ function sendToRDStation(room) {
 		options.data.tags = livechatData.tags;
 	}
 
-	Object.keys(livechatData.customFields || {}).forEach((field) => {
+	Object.keys(livechatData.customFields || {}).forEach(field => {
 		options.data[field] = livechatData.customFields[field];
 	});
 
-	Object.keys(livechatData.visitor.customFields || {}).forEach((field) => {
+	Object.keys(livechatData.visitor.customFields || {}).forEach(field => {
 		options.data[field] = livechatData.visitor.customFields[field];
 	});
 

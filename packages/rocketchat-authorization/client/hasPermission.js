@@ -1,7 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { Template } from 'meteor/templating';
-import { RocketChat } from 'meteor/rocketchat:lib';
-import { ChatPermissions } from './lib/ChatPermissions';
+/* globals ChatPermissions */
 
 function atLeastOne(permissions = [], scope) {
 	return permissions.some((permissionId) => {
@@ -55,8 +52,7 @@ RocketChat.authz.hasAllPermission = function(permissions, scope) {
 	return hasPermission(permissions, scope, all);
 };
 
-RocketChat.authz.hasPermission = RocketChat.authz.hasAllPermission;
-
 RocketChat.authz.hasAtLeastOnePermission = function(permissions, scope) {
 	return hasPermission(permissions, scope, atLeastOne);
 };
+

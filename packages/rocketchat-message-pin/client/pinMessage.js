@@ -1,7 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-import { ChatMessage } from 'meteor/rocketchat:ui';
-
 Meteor.methods({
 	pinMessage(message) {
 		if (!Meteor.userId()) {
@@ -14,11 +10,11 @@ Meteor.methods({
 			return false;
 		}
 		return ChatMessage.update({
-			_id: message._id,
+			_id: message._id
 		}, {
 			$set: {
-				pinned: true,
-			},
+				pinned: true
+			}
 		});
 	},
 	unpinMessage(message) {
@@ -32,11 +28,11 @@ Meteor.methods({
 			return false;
 		}
 		return ChatMessage.update({
-			_id: message._id,
+			_id: message._id
 		}, {
 			$set: {
-				pinned: false,
-			},
+				pinned: false
+			}
 		});
-	},
+	}
 });

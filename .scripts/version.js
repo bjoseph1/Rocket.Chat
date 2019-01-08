@@ -1,3 +1,5 @@
+/* eslint object-shorthand: 0, prefer-template: 0 */
+
 const path = require('path');
 let pkgJson = {};
 

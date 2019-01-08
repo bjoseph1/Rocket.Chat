@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
-
 Meteor.methods({
 	checkUsernameAvailability(username) {
 		check(username, String);
@@ -19,9 +16,9 @@ Meteor.methods({
 			return true;
 		}
 		return RocketChat.checkUsernameAvailability(username);
-	},
+	}
 });
 
 RocketChat.RateLimiter.limitMethod('checkUsernameAvailability', 1, 1000, {
-	userId() { return true; },
+	userId() { return true; }
 });

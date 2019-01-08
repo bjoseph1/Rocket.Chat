@@ -1,4 +1,4 @@
 import { Importers } from 'meteor/rocketchat:importer';
-import { HipChatEnterpriseImporterInfo } from '../lib/info';
+import { HipChatEnterpriseImporterInfo } from '../info';
 
 Importers.add(new HipChatEnterpriseImporterInfo());

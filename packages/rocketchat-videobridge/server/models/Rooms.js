@@ -3,17 +3,15 @@
  * @param {string} _id - Room id
  * @parm {number} time - time to set
  */
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 RocketChat.models.Rooms.setJitsiTimeout = function(_id, time) {
 	const query = {
-		_id,
+		_id
 	};
 
 	const update = {
 		$set: {
-			jitsiTimeout: time,
-		},
+			jitsiTimeout: time
+		}
 	};
 
 	return this.update(query, update);

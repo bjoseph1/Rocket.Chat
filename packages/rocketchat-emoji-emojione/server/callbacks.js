@@ -1,7 +1,6 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-import { emojione } from 'meteor/emojione:emojione';
-
+/* globals emojione */
 Meteor.startup(function() {
-	RocketChat.callbacks.add('beforeSendMessageNotifications', (message) => emojione.shortnameToUnicode(message));
+	RocketChat.callbacks.add('beforeNotifyUser', (message) => {
+		return emojione.shortnameToUnicode(message);
+	});
 });

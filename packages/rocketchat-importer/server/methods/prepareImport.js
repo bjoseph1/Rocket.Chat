@@ -1,7 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
 import { Importers } from 'meteor/rocketchat:importer';
-import { RocketChat } from 'meteor/rocketchat:lib';
 
 Meteor.methods({
 	prepareImport(key, dataURI, contentType, fileName) {
@@ -10,7 +7,7 @@ Meteor.methods({
 		}
 
 		if (!RocketChat.authz.hasPermission(Meteor.userId(), 'run-import')) {
-			throw new Meteor.Error('error-action-not-allowed', 'Importing is not allowed', { method: 'setupImporter' });
+			throw new Meteor.Error('error-action-not-allowed', 'Importing is not allowed', { method: 'setupImporter'});
 		}
 
 		check(key, String);
@@ -26,9 +23,9 @@ Meteor.methods({
 		const results = importer.instance.prepare(dataURI, contentType, fileName);
 
 		if (results instanceof Promise) {
-			return results.catch((e) => { throw new Meteor.Error(e); });
+			return results.catch(e => { throw new Meteor.Error(e); });
 		} else {
 			return results;
 		}
-	},
+	}
 });

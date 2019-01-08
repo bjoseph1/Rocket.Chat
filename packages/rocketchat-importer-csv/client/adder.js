@@ -1,4 +1,4 @@
 import { Importers } from 'meteor/rocketchat:importer';
-import { CsvImporterInfo } from '../lib/info';
+import { CsvImporterInfo } from '../info';
 
 Importers.add(new CsvImporterInfo());

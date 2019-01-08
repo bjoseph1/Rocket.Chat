@@ -1,7 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { Template } from 'meteor/templating';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 const getTitle = function(self) {
 	if (self.meta == null) {
 		return;
@@ -31,8 +27,9 @@ Template.oembedVideoWidget.helpers({
 		if (this.collapsed) {
 			return this.collapsed;
 		} else {
-			return RocketChat.getUserPreference(Meteor.userId(), 'collapseMediaByDefault') === true;
+			const user = Meteor.user();
+			return RocketChat.getUserPreference(user, 'collapseMediaByDefault') === true;
 		}
-	},
+	}
 
 });

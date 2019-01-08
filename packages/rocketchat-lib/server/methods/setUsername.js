@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
 import _ from 'underscore';
 
 Meteor.methods({
@@ -48,9 +46,9 @@ Meteor.methods({
 		}
 
 		return username;
-	},
+	}
 });
 
 RocketChat.RateLimiter.limitMethod('setUsername', 1, 1000, {
-	userId() { return true; },
+	userId() { return true; }
 });

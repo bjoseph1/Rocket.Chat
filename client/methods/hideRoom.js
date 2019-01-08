@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 Meteor.methods({
 	hideRoom(rid) {
 		if (!Meteor.userId()) {
@@ -7,12 +6,12 @@ Meteor.methods({
 
 		ChatSubscription.update({
 			rid,
-			'u._id': Meteor.userId(),
+			'u._id': Meteor.userId()
 		}, {
 			$set: {
 				alert: false,
-				open: false,
-			},
+				open: false
+			}
 		});
-	},
+	}
 });

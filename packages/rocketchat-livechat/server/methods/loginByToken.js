@@ -1,16 +1,15 @@
-import { Meteor } from 'meteor/meteor';
 import LivechatVisitors from '../models/LivechatVisitors';
 
 Meteor.methods({
 	'livechat:loginByToken'(token) {
-		const visitor = LivechatVisitors.getVisitorByToken(token, { fields: { _id: 1 } });
+		const user = LivechatVisitors.getVisitorByToken(token, { fields: { _id: 1 } });
 
-		if (!visitor) {
+		if (!user) {
 			return;
 		}
 
 		return {
-			_id: visitor._id,
+			_id: user._id
 		};
-	},
+	}
 });

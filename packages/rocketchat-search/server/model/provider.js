@@ -1,6 +1,5 @@
-/* eslint no-unused-vars: [2, { "args": "none" }]*/
+/*eslint no-unused-vars: [2, { "args": "none" }]*/
 import SearchLogger from '../logger/logger';
-import { RocketChat } from 'meteor/rocketchat:lib';
 
 /**
  * Setting Object in order to manage settings loading for providers and admin ui display
@@ -49,7 +48,7 @@ class Settings {
 	}
 
 	list() {
-		return Object.keys(this.settings).map((key) => this.settings[key]);
+		return Object.keys(this.settings).map(key => this.settings[key]);
 	}
 
 	map() {
@@ -91,7 +90,7 @@ export default class SearchProvider {
 		this._settings = new Settings(key);
 	}
 
-	/* --- basic params ---*/
+	/*--- basic params ---*/
 	get key() {
 		return this._key;
 	}
@@ -116,7 +115,7 @@ export default class SearchProvider {
 		return this._settings.map();
 	}
 
-	/* --- templates ---*/
+	/*--- templates ---*/
 	get resultTemplate() {
 		return 'DefaultSearchResultTemplate';
 	}
@@ -125,7 +124,7 @@ export default class SearchProvider {
 		return 'DefaultSuggestionItemTemplate';
 	}
 
-	/* --- search functions ---*/
+	/*--- search functions ---*/
 	/**
 	 * Search using the current search provider and check if results are valid for the user. The search result has
 	 * the format {messages:{start:0,numFound:1,docs:[{...}]},users:{...},rooms:{...}}
@@ -153,12 +152,12 @@ export default class SearchProvider {
 		return false;
 	}
 
-	/* --- triggers ---*/
+	/*--- triggers ---*/
 	on(name, value) {
 		return true;
 	}
 
-	/* --- livecycle ---*/
+	/*--- livecycle ---*/
 	run(reason, callback) {
 		return new Promise((resolve, reject) => {
 			this._settings.load();

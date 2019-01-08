@@ -15,7 +15,7 @@ elif [[ $CIRCLE_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 else
   SNAP_CHANNEL=edge
   RC_RELEASE=develop
-  RC_VERSION="$(npm run version --silent)"
+  RC_VERSION=0.60.0-develop
 fi
 
 export SNAP_CHANNEL

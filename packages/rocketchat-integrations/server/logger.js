@@ -1,8 +1,9 @@
-import { Logger } from 'meteor/rocketchat:logger';
+/* globals logger:true */
+/* exported logger */
 
-export const logger = new Logger('Integrations', {
+logger = new Logger('Integrations', {
 	sections: {
 		incoming: 'Incoming WebHook',
-		outgoing: 'Outgoing WebHook',
-	},
+		outgoing: 'Outgoing WebHook'
+	}
 });

@@ -5,7 +5,6 @@ whitelist:
     - TwizzyDizzy
     - theorenck
     - JSzaszvari
-    - reetp
   labels:
     - "Contributions: welcome"
     - "Contributions: only core team"

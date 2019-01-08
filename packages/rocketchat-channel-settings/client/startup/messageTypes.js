@@ -1,8 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-import { t } from 'meteor/rocketchat:utils';
-import s from 'underscore.string';
-
 Meteor.startup(function() {
 	RocketChat.MessageTypes.registerType({
 		id: 'room_changed_privacy',
@@ -11,9 +6,9 @@ Meteor.startup(function() {
 		data(message) {
 			return {
 				user_by: message.u && message.u.username,
-				room_type: t(message.msg),
+				room_type: t(message.msg)
 			};
-		},
+		}
 	});
 
 	RocketChat.MessageTypes.registerType({
@@ -23,9 +18,9 @@ Meteor.startup(function() {
 		data(message) {
 			return {
 				user_by: message.u && message.u.username,
-				room_topic: s.escapeHTML(message.msg || `(${ t('None').toLowerCase() })`),
+				room_topic: message.msg
 			};
-		},
+		}
 	});
 
 	RocketChat.MessageTypes.registerType({
@@ -35,9 +30,9 @@ Meteor.startup(function() {
 		data(message) {
 			return {
 				user_by: message.u && message.u.username,
-				room_announcement: s.escapeHTML(message.msg || `(${ t('None').toLowerCase() })`),
+				room_announcement: message.msg
 			};
-		},
+		}
 	});
 
 	RocketChat.MessageTypes.registerType({
@@ -47,8 +42,8 @@ Meteor.startup(function() {
 		data(message) {
 			return {
 				user_by: message.u && message.u.username,
-				room_description: s.escapeHTML(message.msg || `(${ t('None').toLowerCase() })`),
+				room_description: message.msg
 			};
-		},
+		}
 	});
 });

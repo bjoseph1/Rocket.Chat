@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 Meteor.publish('starredMessages', function(rid, limit = 50) {
 	if (!this.userId) {
 		return this.ready();
@@ -10,14 +7,11 @@ Meteor.publish('starredMessages', function(rid, limit = 50) {
 	if (!user) {
 		return this.ready();
 	}
-	if (!Meteor.call('canAccessRoom', rid, this.userId)) {
-		return this.ready();
-	}
 	const cursorHandle = RocketChat.models.Messages.findStarredByUserAtRoom(this.userId, rid, {
 		sort: {
-			ts: -1,
+			ts: -1
 		},
-		limit,
+		limit
 	}).observeChanges({
 		added(_id, record) {
 			return publication.added('rocketchat_starred_message', _id, record);
@@ -27,7 +21,7 @@ Meteor.publish('starredMessages', function(rid, limit = 50) {
 		},
 		removed(_id) {
 			return publication.removed('rocketchat_starred_message', _id);
-		},
+		}
 	});
 	this.ready();
 	return this.onStop(function() {

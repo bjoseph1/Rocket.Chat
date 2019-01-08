@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
 import _ from 'underscore';
 import s from 'underscore.string';
 
@@ -14,7 +12,7 @@ class LivechatVisitors extends RocketChat.models._Base {
 	 */
 	getVisitorByToken(token, options) {
 		const query = {
-			token,
+			token
 		};
 
 		return this.findOne(query, options);
@@ -26,7 +24,7 @@ class LivechatVisitors extends RocketChat.models._Base {
 	 */
 	findById(_id, options) {
 		const query = {
-			_id,
+			_id
 		};
 
 		return this.find(query, options);
@@ -38,7 +36,7 @@ class LivechatVisitors extends RocketChat.models._Base {
 	 */
 	findVisitorByToken(token) {
 		const query = {
-			token,
+			token
 		};
 
 		return this.find(query);
@@ -46,7 +44,7 @@ class LivechatVisitors extends RocketChat.models._Base {
 
 	updateLivechatDataByToken(token, key, value, overwrite = true) {
 		const query = {
-			token,
+			token
 		};
 
 		if (!overwrite) {
@@ -58,8 +56,8 @@ class LivechatVisitors extends RocketChat.models._Base {
 
 		const update = {
 			$set: {
-				[`livechatData.${ key }`]: value,
-			},
+				[`livechatData.${ key }`]: value
+			}
 		};
 
 		return this.update(query, update);
@@ -71,21 +69,10 @@ class LivechatVisitors extends RocketChat.models._Base {
 	 */
 	findOneVisitorByPhone(phone) {
 		const query = {
-			'phone.phoneNumber': phone,
+			'phone.phoneNumber': phone
 		};
 
 		return this.findOne(query);
-	}
-
-	getVisitorsBetweenDate(date) {
-		const query = {
-			_updatedAt: {
-				$gte: date.gte,	// ISO Date, ts >= date.gte
-				$lt: date.lt,	// ISODate, ts < date.lt
-			},
-		};
-
-		return this.find(query, { fields: { _id: 1 } });
 	}
 
 	/**
@@ -97,13 +84,13 @@ class LivechatVisitors extends RocketChat.models._Base {
 		const findAndModify = Meteor.wrapAsync(settingsRaw.findAndModify, settingsRaw);
 
 		const query = {
-			_id: 'Livechat_guest_count',
+			_id: 'Livechat_guest_count'
 		};
 
 		const update = {
 			$inc: {
-				value: 1,
-			},
+				value: 1
+			}
 		};
 
 		const livechatCount = findAndModify(query, null, update);
@@ -130,7 +117,7 @@ class LivechatVisitors extends RocketChat.models._Base {
 		if (data.email) {
 			if (!_.isEmpty(s.trim(data.email))) {
 				setData.visitorEmails = [
-					{ address: s.trim(data.email) },
+					{ address: s.trim(data.email) }
 				];
 			} else {
 				unsetData.visitorEmails = 1;
@@ -140,7 +127,7 @@ class LivechatVisitors extends RocketChat.models._Base {
 		if (data.phone) {
 			if (!_.isEmpty(s.trim(data.phone))) {
 				setData.phone = [
-					{ phoneNumber: s.trim(data.phone) },
+					{ phoneNumber: s.trim(data.phone) }
 				];
 			} else {
 				unsetData.phone = 1;
@@ -166,7 +153,7 @@ class LivechatVisitors extends RocketChat.models._Base {
 
 	findOneGuestByEmailAddress(emailAddress) {
 		const query = {
-			'visitorEmails.address': new RegExp(`^${ s.escapeRegExp(emailAddress) }$`, 'i'),
+			'visitorEmails.address': new RegExp(`^${ s.escapeRegExp(emailAddress) }$`, 'i')
 		};
 
 		return this.findOne(query);
@@ -174,20 +161,24 @@ class LivechatVisitors extends RocketChat.models._Base {
 
 	saveGuestEmailPhoneById(_id, emails, phones) {
 		const update = {
-			$addToSet: {},
+			$addToSet: {}
 		};
 
 		const saveEmail = [].concat(emails)
-			.filter((email) => email && email.trim())
-			.map((email) => ({ address: email }));
+			.filter(email => email && email.trim())
+			.map(email => {
+				return { address: email };
+			});
 
 		if (saveEmail.length > 0) {
 			update.$addToSet.visitorEmails = { $each: saveEmail };
 		}
 
 		const savePhone = [].concat(phones)
-			.filter((phone) => phone && phone.trim().replace(/[^\d]/g, ''))
-			.map((phone) => ({ phoneNumber: phone }));
+			.filter(phone => phone && phone.trim().replace(/[^\d]/g, ''))
+			.map(phone => {
+				return { phoneNumber: phone };
+			});
 
 		if (savePhone.length > 0) {
 			update.$addToSet.phone = { $each: savePhone };

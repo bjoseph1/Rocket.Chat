@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
 import _ from 'underscore';
 /**
  * Livechat Department model
@@ -16,13 +14,13 @@ class LivechatDepartmentAgents extends RocketChat.models._Base {
 	saveAgent(agent) {
 		return this.upsert({
 			agentId: agent.agentId,
-			departmentId: agent.departmentId,
+			departmentId: agent.departmentId
 		}, {
 			$set: {
 				username: agent.username,
 				count: parseInt(agent.count),
-				order: parseInt(agent.order),
-			},
+				order: parseInt(agent.order)
+			}
 		});
 	}
 
@@ -44,19 +42,19 @@ class LivechatDepartmentAgents extends RocketChat.models._Base {
 		const query = {
 			departmentId,
 			username: {
-				$in: onlineUsernames,
-			},
+				$in: onlineUsernames
+			}
 		};
 
 		const sort = {
 			count: 1,
 			order: 1,
-			username: 1,
+			username: 1
 		};
 		const update = {
 			$inc: {
-				count: 1,
-			},
+				count: 1
+			}
 		};
 
 		const collectionObj = this.model.rawCollection();
@@ -66,7 +64,7 @@ class LivechatDepartmentAgents extends RocketChat.models._Base {
 		if (agent && agent.value) {
 			return {
 				agentId: agent.value.agentId,
-				username: agent.value.username,
+				username: agent.value.username
 			};
 		} else {
 			return null;
@@ -87,8 +85,8 @@ class LivechatDepartmentAgents extends RocketChat.models._Base {
 		const query = {
 			departmentId,
 			username: {
-				$in: onlineUsernames,
-			},
+				$in: onlineUsernames
+			}
 		};
 
 		const depAgents = this.find(query);
@@ -105,7 +103,7 @@ class LivechatDepartmentAgents extends RocketChat.models._Base {
 
 		if (!_.isEmpty(usersList)) {
 			query.username = {
-				$in: usersList,
+				$in: usersList
 			};
 		}
 
@@ -114,20 +112,20 @@ class LivechatDepartmentAgents extends RocketChat.models._Base {
 				departmentId: 1,
 				count: 1,
 				order: 1,
-				username: 1,
-			},
+				username: 1
+			}
 		};
 
 		return this.find(query, options);
 	}
 
 	replaceUsernameOfAgentByUserId(userId, username) {
-		const query = { agentId: userId };
+		const query = {'agentId': userId};
 
 		const update = {
 			$set: {
-				username,
-			},
+				username
+			}
 		};
 
 		return this.update(query, update, { multi: true });

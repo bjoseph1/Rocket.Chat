@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-
 Meteor.publish('activeUsers', function() {
 	if (!this.userId) {
 		return this.ready();
@@ -10,7 +8,7 @@ Meteor.publish('activeUsers', function() {
 			username: 1,
 			name: 1,
 			status: 1,
-			utcOffset: 1,
-		},
+			utcOffset: 1
+		}
 	});
 });

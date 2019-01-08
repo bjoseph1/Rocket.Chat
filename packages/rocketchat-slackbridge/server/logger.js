@@ -1,11 +1,10 @@
-import { Logger } from 'meteor/rocketchat:logger';
+/* globals logger:true */
+/* exported logger */
 
-export const logger = new Logger('SlackBridge', {
+logger = new Logger('SlackBridge', {
 	sections: {
 		connection: 'Connection',
 		events: 'Events',
-		class: 'Class',
-		slack: 'Slack',
-		rocket: 'Rocket',
-	},
+		class: 'Class'
+	}
 });

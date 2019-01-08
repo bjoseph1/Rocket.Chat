@@ -1,5 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { WebApp } from 'meteor/webapp';
+/* globals FileUpload, WebApp */
 
 WebApp.connectHandlers.use('/file-upload/',	function(req, res, next) {
 

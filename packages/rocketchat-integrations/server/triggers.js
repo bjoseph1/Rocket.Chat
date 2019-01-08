@@ -1,8 +1,6 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 const callbackHandler = function _callbackHandler(eventType) {
-	return function _wrapperFunction(...args) {
-		return RocketChat.integrations.triggerHandler.executeTriggers(eventType, ...args);
+	return function _wrapperFunction() {
+		return RocketChat.integrations.triggerHandler.executeTriggers(eventType, ...arguments);
 	};
 };
 

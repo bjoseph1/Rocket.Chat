@@ -1,9 +1,6 @@
-import { Blaze } from 'meteor/blaze';
-import { Session } from 'meteor/session';
-
 Blaze.registerHelper('avatarUrlFromUsername', getAvatarUrlFromUsername);
 
-export const getAvatarAsPng = function(username, cb) {
+this.getAvatarAsPng = function(username, cb) {
 	const image = new Image;
 	image.src = getAvatarUrlFromUsername(username);
 	image.onload = function() {
@@ -24,7 +21,8 @@ export const getAvatarAsPng = function(username, cb) {
 	};
 };
 
-updateAvatarOfUsername = function(username) {
+this.updateAvatarOfUsername = function(username) {
+
 	const key = `avatar_random_${ username }`;
 	Session.set(key, Math.round(Math.random() * 1000));
 

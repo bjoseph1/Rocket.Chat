@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 import s from 'underscore.string';
 
 RocketChat._setEmail = function(userId, email, shouldSendVerificationEmail = true) {
@@ -35,5 +34,5 @@ RocketChat._setEmail = function(userId, email, shouldSendVerificationEmail = tru
 };
 
 RocketChat.setEmail = RocketChat.RateLimiter.limitFunction(RocketChat._setEmail, 1, 60000, {
-	0() { return !Meteor.userId() || !RocketChat.authz.hasPermission(Meteor.userId(), 'edit-other-user-info'); }, // Administrators have permission to change others emails, so don't limit those
+	0() { return !Meteor.userId() || !RocketChat.authz.hasPermission(Meteor.userId(), 'edit-other-user-info'); } // Administrators have permission to change others emails, so don't limit those
 });

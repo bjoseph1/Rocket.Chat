@@ -1,6 +1,3 @@
-import { ReactiveVar } from 'meteor/reactive-var';
-import { Tracker } from 'meteor/tracker';
-
 export class RocketChatTabBar {
 	constructor() {
 		this.template = new ReactiveVar();

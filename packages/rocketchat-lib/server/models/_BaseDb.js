@@ -1,9 +1,8 @@
-import { Match } from 'meteor/check';
-import { Mongo, MongoInternals } from 'meteor/mongo';
+/* globals MongoInternals */
 import _ from 'underscore';
 
 const baseName = 'rocketchat_';
-import { EventEmitter } from 'events';
+import {EventEmitter} from 'events';
 
 const trash = new Mongo.Collection(`${ baseName }_trash`);
 try {
@@ -37,14 +36,12 @@ class ModelsBaseDb extends EventEmitter {
 
 		this.wrapModel();
 
-		let alreadyListeningToOplog = false;
 		// When someone start listening for changes we start oplog if available
-		this.on('newListener', (event/* , listener*/) => {
-			if (event === 'change' && alreadyListeningToOplog === false) {
-				alreadyListeningToOplog = true;
+		this.once('newListener', (event/*, listener*/) => {
+			if (event === 'change') {
 				if (isOplogEnabled) {
 					const query = {
-						collection: this.collectionName,
+						collection: this.collectionName
 					};
 
 					MongoInternals.defaultRemoteCollectionDriver().mongo._oplogHandle.onOplogEntry(query, this.processOplogRecord.bind(this));
@@ -53,7 +50,7 @@ class ModelsBaseDb extends EventEmitter {
 			}
 		});
 
-		this.tryEnsureIndex({ _updatedAt: 1 });
+		this.tryEnsureIndex({ '_updatedAt': 1 });
 	}
 
 	get baseName() {
@@ -84,53 +81,86 @@ class ModelsBaseDb extends EventEmitter {
 		this.originals = {
 			insert: this.model.insert.bind(this.model),
 			update: this.model.update.bind(this.model),
-			remove: this.model.remove.bind(this.model),
+			remove: this.model.remove.bind(this.model)
 		};
 		const self = this;
 
-		this.model.insert = function(...args) {
-			return self.insert(...args);
+		this.model.insert = function() {
+			return self.insert(...arguments);
 		};
 
-		this.model.update = function(...args) {
-			return self.update(...args);
+		this.model.update = function() {
+			return self.update(...arguments);
 		};
 
-		this.model.remove = function(...args) {
-			return self.remove(...args);
+		this.model.remove = function() {
+			return self.remove(...arguments);
 		};
 	}
 
-	_doNotMixInclusionAndExclusionFields(options) {
-		if (options && options.fields) {
-			const keys = Object.keys(options.fields);
-			const removeKeys = keys.filter((key) => options.fields[key] === 0);
-			if (keys.length > removeKeys.length) {
-				removeKeys.forEach((key) => delete options.fields[key]);
-			}
-		}
+	find() {
+		return this.model.find(...arguments);
 	}
 
-	find(...args) {
-		this._doNotMixInclusionAndExclusionFields(args[1]);
-		return this.model.find(...args);
-	}
-
-	findOne(...args) {
-		this._doNotMixInclusionAndExclusionFields(args[1]);
-		return this.model.findOne(...args);
+	findOne() {
+		return this.model.findOne(...arguments);
 	}
 
 	findOneById(_id, options) {
-		return this.findOne({ _id }, options);
+		return this.model.findOne({ _id }, options);
 	}
 
 	findOneByIds(ids, options) {
-		return this.findOne({ _id: { $in: ids } }, options);
+		return this.model.findOne({ _id: { $in: ids }}, options);
+	}
+
+	defineSyncStrategy(query, modifier, options) {
+		if (this.baseModel.useCache === false) {
+			return 'db';
+		}
+
+		if (options.upsert === true) {
+			return 'db';
+		}
+
+		// const dbModifiers = [
+		// 	'$currentDate',
+		// 	'$bit',
+		// 	'$pull',
+		// 	'$pushAll',
+		// 	'$push',
+		// 	'$setOnInsert'
+		// ];
+
+		const cacheAllowedModifiers = [
+			'$set',
+			'$unset',
+			'$min',
+			'$max',
+			'$inc',
+			'$mul',
+			'$rename',
+			'$pullAll',
+			'$pop',
+			'$addToSet'
+		];
+
+		const notAllowedModifiers = Object.keys(modifier).filter(i => i.startsWith('$') && cacheAllowedModifiers.includes(i) === false);
+
+		if (notAllowedModifiers.length > 0) {
+			return 'db';
+		}
+
+		const placeholderFields = Object.keys(query).filter(item => item.indexOf('$') > -1);
+		if (placeholderFields.length > 0) {
+			return 'db';
+		}
+
+		return 'cache';
 	}
 
 	updateHasPositionalOperator(update) {
-		return Object.keys(update).some((key) => key.includes('.$') || (Match.test(update[key], Object) && this.updateHasPositionalOperator(update[key])));
+		return Object.keys(update).some(key => key.includes('.$') || (!Match.test(update[key], Object) && this.updateHasPositionalOperator(update[key])));
 	}
 
 	processOplogRecord(action) {
@@ -141,10 +171,9 @@ class ModelsBaseDb extends EventEmitter {
 		if (action.op.op === 'i') {
 			this.emit('change', {
 				action: 'insert',
-				clientAction: 'inserted',
 				id: action.op.o._id,
 				data: action.op.o,
-				oplog: true,
+				oplog: true
 			});
 			return;
 		}
@@ -152,11 +181,10 @@ class ModelsBaseDb extends EventEmitter {
 		if (action.op.op === 'u') {
 			if (!action.op.o.$set && !action.op.o.$unset) {
 				this.emit('change', {
-					action: 'update',
-					clientAction: 'updated',
+					action: 'update:record',
 					id: action.id,
 					data: action.op.o,
-					oplog: true,
+					oplog: true
 				});
 				return;
 			}
@@ -179,11 +207,10 @@ class ModelsBaseDb extends EventEmitter {
 			}
 
 			this.emit('change', {
-				action: 'update',
-				clientAction: 'updated',
+				action: 'update:diff',
 				id: action.id,
-				diff,
-				oplog: true,
+				data: diff,
+				oplog: true
 			});
 			return;
 		}
@@ -191,30 +218,27 @@ class ModelsBaseDb extends EventEmitter {
 		if (action.op.op === 'd') {
 			this.emit('change', {
 				action: 'remove',
-				clientAction: 'removed',
 				id: action.id,
-				oplog: true,
+				oplog: true
 			});
 			return;
 		}
 	}
 
-	insert(record, ...args) {
+	insert(record) {
 		this.setUpdatedAt(record);
 
-		const result = this.originals.insert(record, ...args);
-
-		record._id = result;
-
+		const result = this.originals.insert(...arguments);
 		if (!isOplogEnabled && this.listenerCount('change') > 0) {
 			this.emit('change', {
 				action: 'insert',
-				clientAction: 'inserted',
 				id: result,
 				data: _.extend({}, record),
-				oplog: false,
+				oplog: false
 			});
 		}
+
+		record._id = result;
 
 		return result;
 	}
@@ -222,49 +246,72 @@ class ModelsBaseDb extends EventEmitter {
 	update(query, update, options = {}) {
 		this.setUpdatedAt(update, true, query);
 
+		const strategy = this.defineSyncStrategy(query, update, options);
 		let ids = [];
-		if (!isOplogEnabled && this.listenerCount('change') > 0) {
-			const findOptions = { fields: { _id: 1 } };
+		if (!isOplogEnabled && this.listenerCount('change') > 0 && strategy === 'db') {
+			const findOptions = {fields: {_id: 1}};
 			let records = options.multi ? this.find(query, findOptions).fetch() : this.findOne(query, findOptions) || [];
 			if (!Array.isArray(records)) {
 				records = [records];
 			}
 
-			ids = records.map((item) => item._id);
+			ids = records.map(item => item._id);
 			if (options.upsert !== true && this.updateHasPositionalOperator(update) === false) {
 				query = {
 					_id: {
-						$in: ids,
-					},
+						$in: ids
+					}
 				};
 			}
 		}
 
-		// TODO: CACHE: Can we use findAndModify here when oplog is disabled?
 		const result = this.originals.update(query, update, options);
 
 		if (!isOplogEnabled && this.listenerCount('change') > 0) {
-			if (options.upsert === true && result.insertedId) {
-				this.emit('change', {
-					action: 'insert',
-					clientAction: 'inserted',
-					id: result.insertedId,
-					oplog: false,
-				});
+			if (strategy === 'db') {
+				if (options.upsert === true) {
+					if (result.insertedId) {
+						this.emit('change', {
+							action: 'insert',
+							id: result.insertedId,
+							data: this.findOne({_id: result.insertedId}),
+							oplog: false
+						});
+						return;
+					}
 
-				return result;
-			}
+					query = {
+						_id: {
+							$in: ids
+						}
+					};
+				}
 
-			for (const id of ids) {
+				let records = options.multi ? this.find(query).fetch() : this.findOne(query) || [];
+				if (!Array.isArray(records)) {
+					records = [records];
+				}
+				for (const record of records) {
+					this.emit('change', {
+						action: 'update:record',
+						id: record._id,
+						data: record,
+						oplog: false
+					});
+				}
+			} else {
 				this.emit('change', {
-					action: 'update',
-					clientAction: 'updated',
-					id,
-					oplog: false,
+					action: 'update:query',
+					id: undefined,
+					data: {
+						query,
+						update,
+						options
+					},
+					oplog: false
 				});
 			}
 		}
-
 		return result;
 	}
 
@@ -284,7 +331,7 @@ class ModelsBaseDb extends EventEmitter {
 			record._deletedAt = new Date;
 			record.__collection__ = this.name;
 
-			trash.upsert({ _id: record._id }, _.omit(record, '_id'));
+			trash.upsert({_id: record._id}, _.omit(record, '_id'));
 		}
 
 		query = { _id: { $in: ids } };
@@ -295,10 +342,9 @@ class ModelsBaseDb extends EventEmitter {
 			for (const record of records) {
 				this.emit('change', {
 					action: 'remove',
-					clientAction: 'removed',
 					id: record._id,
 					data: _.extend({}, record),
-					oplog: false,
+					oplog: false
 				});
 			}
 		}
@@ -308,10 +354,10 @@ class ModelsBaseDb extends EventEmitter {
 
 	insertOrUpsert(...args) {
 		if (args[0] && args[0]._id) {
-			const { _id } = args[0];
+			const _id = args[0]._id;
 			delete args[0]._id;
 			args.unshift({
-				_id,
+				_id
 			});
 
 			this.upsert(...args);
@@ -321,35 +367,35 @@ class ModelsBaseDb extends EventEmitter {
 		}
 	}
 
-	allow(...args) {
-		return this.model.allow(...args);
+	allow() {
+		return this.model.allow(...arguments);
 	}
 
-	deny(...args) {
-		return this.model.deny(...args);
+	deny() {
+		return this.model.deny(...arguments);
 	}
 
-	ensureIndex(...args) {
-		return this.model._ensureIndex(...args);
+	ensureIndex() {
+		return this.model._ensureIndex(...arguments);
 	}
 
-	dropIndex(...args) {
-		return this.model._dropIndex(...args);
+	dropIndex() {
+		return this.model._dropIndex(...arguments);
 	}
 
-	tryEnsureIndex(...args) {
+	tryEnsureIndex() {
 		try {
-			return this.ensureIndex(...args);
+			return this.ensureIndex(...arguments);
 		} catch (e) {
-			console.error('Error creating index:', this.name, '->', ...args, e);
+			console.error('Error creating index:', this.name, '->', ...arguments, e);
 		}
 	}
 
-	tryDropIndex(...args) {
+	tryDropIndex() {
 		try {
-			return this.dropIndex(...args);
+			return this.dropIndex(...arguments);
 		} catch (e) {
-			console.error('Error dropping index:', this.name, '->', ...args, e);
+			console.error('Error dropping index:', this.name, '->', ...arguments, e);
 		}
 	}
 
@@ -359,19 +405,10 @@ class ModelsBaseDb extends EventEmitter {
 		return trash.find(query, options);
 	}
 
-	trashFindOneById(_id, options) {
-		const query = {
-			_id,
-			__collection__: this.name,
-		};
-
-		return trash.findOne(query, options);
-	}
-
 	trashFindDeletedAfter(deletedAt, query = {}, options) {
 		query.__collection__ = this.name;
 		query._deletedAt = {
-			$gt: deletedAt,
+			$gt: deletedAt
 		};
 
 		return trash.find(query, options);

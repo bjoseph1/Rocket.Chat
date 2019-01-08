@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-
 class ImporterWebsocketDef {
 	constructor() {
 		this.streamer = new Meteor.Streamer('importers', { retransmit: false });

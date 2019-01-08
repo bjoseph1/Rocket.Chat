@@ -1,3 +1,5 @@
+/* globals FileUpload */
+
 import _ from 'underscore';
 import { FileUploadClass } from '../lib/FileUpload';
 import '../../ufs/GoogleStorage/server.js';
@@ -14,7 +16,7 @@ const get = function(file, req, res) {
 			const storeType = file.store.split(':').pop();
 			if (RocketChat.settings.get(`FileUpload_GoogleStorage_Proxy_${ storeType }`)) {
 				const request = /^https:/.test(fileUrl) ? https : http;
-				request.get(fileUrl, (fileRes) => fileRes.pipe(res));
+				request.get(fileUrl, fileRes => fileRes.pipe(res));
 			} else {
 				res.removeHeader('Content-Length');
 				res.setHeader('Location', fileUrl);
@@ -35,7 +37,7 @@ const copy = function(file, out) {
 
 		if (fileUrl) {
 			const request = /^https:/.test(fileUrl) ? https : http;
-			request.get(fileUrl, (fileRes) => fileRes.pipe(out));
+			request.get(fileUrl, fileRes => fileRes.pipe(out));
 		} else {
 			out.end();
 		}
@@ -45,21 +47,21 @@ const copy = function(file, out) {
 const GoogleCloudStorageUploads = new FileUploadClass({
 	name: 'GoogleCloudStorage:Uploads',
 	get,
-	copy,
+	copy
 	// store setted bellow
 });
 
 const GoogleCloudStorageAvatars = new FileUploadClass({
 	name: 'GoogleCloudStorage:Avatars',
 	get,
-	copy,
+	copy
 	// store setted bellow
 });
 
 const GoogleCloudStorageUserDataFiles = new FileUploadClass({
 	name: 'GoogleCloudStorage:UserDataFiles',
 	get,
-	copy,
+	copy
 	// store setted bellow
 });
 
@@ -77,11 +79,11 @@ const configure = _.debounce(function() {
 		connection: {
 			credentials: {
 				client_email: accessId,
-				private_key: secret,
-			},
+				private_key: secret
+			}
 		},
 		bucket,
-		URLExpiryTimeSpan,
+		URLExpiryTimeSpan
 	};
 
 	GoogleCloudStorageUploads.store = FileUpload.configureUploadsStore('GoogleStorage', GoogleCloudStorageUploads.name, config);

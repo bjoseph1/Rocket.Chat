@@ -1,17 +1,17 @@
 Package.describe({
 	name: 'rocketchat:wordpress',
 	version: '0.0.1',
-	summary: 'RocketChat settings for WordPress Oauth Flow',
+	summary: 'RocketChat settings for WordPress Oauth Flow'
 });
 
 Package.onUse(function(api) {
-	api.use([
-		'ecmascript',
-		'rocketchat:lib',
-		'rocketchat:custom-oauth',
-		'templating',
-	]);
+	api.use('ecmascript');
+	api.use('rocketchat:lib');
+	api.use('rocketchat:custom-oauth');
+
+	api.use('templating', 'client');
+
+	api.addFiles('common.js');
 	api.addFiles('client/wordpress-login-button.css', 'client');
-	api.mainModule('client/index.js', 'client');
-	api.mainModule('server/index.js', 'server');
+	api.addFiles('startup.js', 'server');
 });

@@ -1,7 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
-import { TAPi18n } from 'meteor/tap:i18n';
-import { alerts } from 'meteor/rocketchat:ui';
+/* globals alerts */
 
 Meteor.startup(function() {
 	Tracker.autorun(() => {
@@ -22,9 +19,9 @@ Meteor.startup(function() {
 				},
 				onClose() {
 					Meteor.call('banner/dismiss', {
-						id: firstBanner.id,
+						id: firstBanner.id
 					});
-				},
+				}
 			});
 		}
 	});

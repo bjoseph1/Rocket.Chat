@@ -1,8 +1,6 @@
-import { Meteor } from 'meteor/meteor';
-import { Match } from 'meteor/check';
-import { RocketChat } from 'meteor/rocketchat:lib';
+import s from 'underscore.string';
 
-RocketChat.saveRoomAnnouncement = function(rid, roomAnnouncement, user, sendMessage = true) {
+RocketChat.saveRoomAnnouncement = function(rid, roomAnnouncement, user, sendMessage=true) {
 	if (!Match.test(rid, String)) {
 		throw new Meteor.Error('invalid-room', 'Invalid room', { function: 'RocketChat.saveRoomAnnouncement' });
 	}
@@ -12,12 +10,14 @@ RocketChat.saveRoomAnnouncement = function(rid, roomAnnouncement, user, sendMess
 	if (typeof roomAnnouncement === 'string') {
 		message = roomAnnouncement;
 	} else {
-		({ message, ...announcementDetails } = roomAnnouncement);
+		({message, ...announcementDetails} = roomAnnouncement);
 	}
 
-	const updated = RocketChat.models.Rooms.setAnnouncementById(rid, message, announcementDetails);
+	const escapedMessage = s.escapeHTML(message);
+
+	const updated = RocketChat.models.Rooms.setAnnouncementById(rid, escapedMessage, announcementDetails);
 	if (updated && sendMessage) {
-		RocketChat.models.Messages.createRoomSettingsChangedWithTypeRoomIdMessageAndUser('room_changed_announcement', rid, message, user);
+		RocketChat.models.Messages.createRoomSettingsChangedWithTypeRoomIdMessageAndUser('room_changed_announcement', rid, escapedMessage, user);
 	}
 
 	return updated;

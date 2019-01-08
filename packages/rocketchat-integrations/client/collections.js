@@ -1,4 +1,2 @@
-import { Mongo } from 'meteor/mongo';
-
-export const ChatIntegrations = new Mongo.Collection('rocketchat_integrations');
-export const ChatIntegrationHistory = new Mongo.Collection('rocketchat_integration_history');
+this.ChatIntegrations = new Mongo.Collection('rocketchat_integrations');
+this.ChatIntegrationHistory = new Mongo.Collection('rocketchat_integration_history');

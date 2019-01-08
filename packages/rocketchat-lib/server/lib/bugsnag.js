@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 import bugsnag from 'bugsnag';
 
 RocketChat.bugsnag = bugsnag;
@@ -28,7 +27,7 @@ process.on('uncaughtException', Meteor.bindEnvironment((error) => {
 }));
 
 const originalMeteorDebug = Meteor._debug;
-Meteor._debug = function(...args) {
-	notify(...args);
-	return originalMeteorDebug(...args);
+Meteor._debug = function() {
+	notify(...arguments);
+	return originalMeteorDebug(...arguments);
 };

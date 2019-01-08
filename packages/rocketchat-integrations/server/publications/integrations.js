@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 Meteor.publish('integrations', function _integrationPublication() {
 	if (!this.userId) {
 		return this.ready();

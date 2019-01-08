@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
 import _ from 'underscore';
 
 RocketChat.authz.addUserRoles = function(userId, roleNames, scope) {
@@ -10,7 +8,7 @@ RocketChat.authz.addUserRoles = function(userId, roleNames, scope) {
 	const user = RocketChat.models.Users.db.findOneById(userId);
 	if (!user) {
 		throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-			function: 'RocketChat.authz.addUserRoles',
+			function: 'RocketChat.authz.addUserRoles'
 		});
 	}
 

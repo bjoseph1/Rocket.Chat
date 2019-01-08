@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-
 Meteor.publish('channelAndPrivateAutocomplete', function(selector) {
 	if (!this.userId) {
 		return this.ready();
@@ -13,15 +11,15 @@ Meteor.publish('channelAndPrivateAutocomplete', function(selector) {
 	const options = {
 		fields: {
 			_id: 1,
-			name: 1,
+			name: 1
 		},
 		limit: 10,
 		sort: {
-			name: 1,
-		},
+			name: 1
+		}
 	};
 
-	const cursorHandle = RocketChat.models.Rooms.findChannelAndPrivateByNameStarting(selector.name, options).observeChanges({
+	const cursorHandle = RocketChat.models.Rooms.findByNameStartingAndTypes(selector.name, ['c', 'p'], options).observeChanges({
 		added(_id, record) {
 			return pub.added('autocompleteRecords', _id, record);
 		},
@@ -30,7 +28,7 @@ Meteor.publish('channelAndPrivateAutocomplete', function(selector) {
 		},
 		removed(_id, record) {
 			return pub.removed('autocompleteRecords', _id, record);
-		},
+		}
 	});
 
 	this.ready();

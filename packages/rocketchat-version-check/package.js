@@ -2,7 +2,7 @@ Package.describe({
 	name: 'rocketchat:version-check',
 	version: '0.0.1',
 	summary: 'Check for new avaiable versions',
-	git: '',
+	git: ''
 });
 
 Package.onUse(function(api) {
@@ -11,8 +11,7 @@ Package.onUse(function(api) {
 		'ecmascript',
 		'rocketchat:lib',
 		'rocketchat:logger',
-		'rocketchat:cloud',
-		'littledata:synced-cron',
+		'percolate:synced-cron'
 	]);
 
 	api.mainModule('client/client.js', 'client');

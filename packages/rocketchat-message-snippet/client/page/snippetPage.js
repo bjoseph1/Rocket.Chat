@@ -1,9 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { DateFormat } from 'meteor/rocketchat:lib';
-import { FlowRouter } from 'meteor/kadira:flow-router';
-import { Template } from 'meteor/templating';
-import { RocketChat } from 'meteor/rocketchat:lib';
-import { SnippetedMessages } from '../lib/collections';
+/* global SnippetedMessages */
 import moment from 'moment';
 
 Template.snippetPage.helpers({
@@ -28,9 +23,9 @@ Template.snippetPage.helpers({
 	time() {
 		const snippet = SnippetedMessages.findOne({ _id: FlowRouter.getParam('snippetId') });
 		if (snippet !== undefined) {
-			return DateFormat.formatTime(snippet.ts);
+			return moment(snippet.ts).format(RocketChat.settings.get('Message_TimeFormat'));
 		}
-	},
+	}
 });
 
 Template.snippetPage.onCreated(function() {
@@ -39,3 +34,4 @@ Template.snippetPage.onCreated(function() {
 		Meteor.subscribe('snippetedMessage', snippetId);
 	});
 });
+

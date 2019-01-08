@@ -1,19 +1,15 @@
-import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
-import { FlowRouter } from 'meteor/kadira:flow-router';
-import { BlazeLayout } from 'meteor/kadira:blaze-layout';
-import { Session } from 'meteor/session';
+/* globals fireGlobalEvent readMessage currentTracker*/
 import _ from 'underscore';
 
-export let currentTracker = undefined;
+currentTracker = undefined;
 
-openRoom = function(type, name) {
+function openRoom(type, name) {
 	Session.set('openedRoom', null);
 
 	return Meteor.defer(() =>
 		currentTracker = Tracker.autorun(function(c) {
 			const user = Meteor.user();
-			if ((user && user.username == null) || (user == null && RocketChat.settings.get('Accounts_AllowAnonymousRead') === false)) {
+			if ((user && user.username == null) || user == null && RocketChat.settings.get('Accounts_AllowAnonymousRead') === false) {
 				BlazeLayout.render('main');
 				return;
 			}
@@ -30,22 +26,23 @@ openRoom = function(type, name) {
 			const room = RocketChat.roomTypes.findRoom(type, name, user);
 			if (room == null) {
 				if (type === 'd') {
-					Meteor.call('createDirectMessage', name, function(error) {
-						if (!error) {
+					Meteor.call('createDirectMessage', name, function(err) {
+						if (!err) {
 							RoomManager.close(type + name);
 							return openRoom('d', name);
 						} else {
-							Session.set('roomNotFound', { type, name, error });
-							BlazeLayout.render('main', { center: 'roomNotFound' });
+							Session.set('roomNotFound', {type, name});
+							BlazeLayout.render('main', {center: 'roomNotFound'});
 							return;
 						}
 					});
 				} else {
-					Meteor.call('getRoomByTypeAndName', type, name, function(error, record) {
-						if (error) {
-							Session.set('roomNotFound', { type, name, error });
-							return BlazeLayout.render('main', { center: 'roomNotFound' });
+					Meteor.call('getRoomByTypeAndName', type, name, function(err, record) {
+						if (err) {
+							Session.set('roomNotFound', {type, name});
+							return BlazeLayout.render('main', {center: 'roomNotFound'});
 						} else {
+							delete record.$loki;
 							RocketChat.models.Rooms.upsert({ _id: record._id }, _.omit(record, '_id'));
 							RoomManager.close(type + name);
 							return openRoom(type, name);
@@ -77,7 +74,7 @@ openRoom = function(type, name) {
 			Meteor.setTimeout(() => readMessage.readNow(), 2000);
 			// KonchatNotification.removeRoomNotification(params._id)
 			// update user's room subscription
-			const sub = ChatSubscription.findOne({ rid: room._id });
+			const sub = ChatSubscription.findOne({rid: room._id});
 			if (sub && sub.open === false) {
 				Meteor.call('openRoom', room._id, function(err) {
 					if (err) {
@@ -94,4 +91,6 @@ openRoom = function(type, name) {
 			return RocketChat.callbacks.run('enter-room', sub);
 		})
 	);
-};
+}
+export { openRoom };
+this.openRoom = openRoom;

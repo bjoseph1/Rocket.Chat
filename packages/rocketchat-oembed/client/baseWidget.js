@@ -1,5 +1,3 @@
-import { Template } from 'meteor/templating';
-
 Template.oembedBaseWidget.helpers({
 	template() {
 		let contentType;
@@ -26,5 +24,5 @@ Template.oembedBaseWidget.helpers({
 			return 'oembedSandstormGrain';
 		}
 		return 'oembedUrlWidget';
-	},
+	}
 });

@@ -1,5 +1,3 @@
-import { TAPi18n } from 'meteor/tap:i18n';
-import { RocketChat } from 'meteor/rocketchat:lib';
 /*
  * MapView is a named function that will replace geolocation in messages with a Google Static Map
  * @param {Object} message - The message object
@@ -26,4 +24,4 @@ function MapView(message) {
 	return message;
 }
 
-RocketChat.callbacks.add('renderMessage', MapView, RocketChat.callbacks.priority.HIGH, 'mapview');
+RocketChat.callbacks.add('renderMessage', MapView, RocketChat.callbacks.priority.HIGH);

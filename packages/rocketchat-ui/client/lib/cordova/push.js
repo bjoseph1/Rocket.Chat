@@ -1,8 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
-import { FlowRouter } from 'meteor/kadira:flow-router';
-import { Push } from 'meteor/rocketchat:push';
-
+/* globals Push Servers*/
 if (Meteor.isCordova) {
 	// Push.addListener 'token', (token) ->
 	// 	Meteor.call 'log', 'CLIENT', 'token', arguments
@@ -78,14 +74,14 @@ if (Meteor.isCordova) {
 					android: {
 						senderID: window.ANDROID_SENDER_ID,
 						sound: true,
-						vibrate: true,
+						vibrate: true
 					},
 					ios: {
 						badge: true,
 						clearBadge: true,
 						sound: true,
-						alert: true,
-					},
+						alert: true
+					}
 				});
 			}
 		})

@@ -1,10 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { ReactiveVar } from 'meteor/reactive-var';
-import { Template } from 'meteor/templating';
-import { modal } from 'meteor/rocketchat:ui';
-import { t } from 'meteor/rocketchat:utils';
-import { handleError } from 'meteor/rocketchat:lib';
-import { LivechatIntegration } from '../../../collections/LivechatIntegration';
+/* globals LivechatIntegration */
 import _ from 'underscore';
 import s from 'underscore.string';
 import toastr from 'toastr';
@@ -36,7 +30,7 @@ Template.livechatIntegrationWebhook.helpers({
 	sendOnAgentMessageChecked() {
 		const setting = LivechatIntegration.findOne('Livechat_webhook_on_agent_message');
 		return setting && setting.value;
-	},
+	}
 });
 
 Template.livechatIntegrationWebhook.onCreated(function() {
@@ -64,7 +58,7 @@ Template.livechatIntegrationWebhook.events({
 				modal.open({
 					title: t('It_works'),
 					type: 'success',
-					timer: 2000,
+					timer: 2000
 				});
 			});
 		}
@@ -92,12 +86,12 @@ Template.livechatIntegrationWebhook.events({
 		e.preventDefault();
 
 		const settings = {
-			Livechat_webhookUrl: s.trim(instance.$('#webhookUrl').val()),
-			Livechat_secret_token: s.trim(instance.$('#secretToken').val()),
-			Livechat_webhook_on_close: instance.$('#sendOnClose').get(0).checked,
-			Livechat_webhook_on_offline_msg: instance.$('#sendOnOffline').get(0).checked,
-			Livechat_webhook_on_visitor_message: instance.$('#sendOnVisitorMessage').get(0).checked,
-			Livechat_webhook_on_agent_message: instance.$('#sendOnAgentMessage').get(0).checked,
+			'Livechat_webhookUrl': s.trim(instance.$('#webhookUrl').val()),
+			'Livechat_secret_token': s.trim(instance.$('#secretToken').val()),
+			'Livechat_webhook_on_close': instance.$('#sendOnClose').get(0).checked,
+			'Livechat_webhook_on_offline_msg': instance.$('#sendOnOffline').get(0).checked,
+			'Livechat_webhook_on_visitor_message': instance.$('#sendOnVisitorMessage').get(0).checked,
+			'Livechat_webhook_on_agent_message': instance.$('#sendOnAgentMessage').get(0).checked
 		};
 		Meteor.call('livechat:saveIntegration', settings, (err) => {
 			if (err) {
@@ -105,5 +99,5 @@ Template.livechatIntegrationWebhook.events({
 			}
 			toastr.success(t('Saved'));
 		});
-	},
+	}
 });

@@ -1,64 +1,46 @@
 .contextual-bar__content {
-	&.livestream {
-		justify-content: flex-start;
-	}
-
-	& .rc-button--stack {
-		width: 100%;
-	}
+  &.livestream {
+    justify-content: flex-start;
+  }
 }
 
 .thumbnail-container {
-	position: relative;
+  position: relative;
+  height: 270px;
 
-	height: 270px;
+  & .--absolute-center {
+    position: absolute;
+    top: calc(50% - 25px);
+    left: calc(50% - 25px);
 
-	& .popout {
-		&--absolute-center {
-			position: absolute;
-			top: calc(50% - 25px);
-			left: calc(50% - 25px);
-
-			font-size: 50px;
-		}
-
-		&--play-solid {
-			fill: white;
-		}
-	}
+    font-size: 50px;
+  }
+  & .--play-solid {
+    fill: var(--rc-color-primary-lightest);;
+  }
 }
-
 .liveStreamTab__form {
-	& .rc-switch {
-		padding: 15px 5px;
-	}
-
-	& .rc-input__label p {
-		padding: 10px 0;
-	}
+  & .rc-switch {
+    padding: 15px 5px;
+  }
 }
 
 .livestream--url {
-	overflow: hidden;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
-	margin: 10px 5px;
-	padding: 10px 0;
+  margin: 10px 5px;
+  padding: 10px 0;
+  font-size: 15px;
 
-	white-space: nowrap;
+  & .current-setting {
+    display: inline-block;
+    text-decoration: none;
+    color: var(--rc-color-primary-dark);
+  }
 
-	text-overflow: ellipsis;
-
-	font-size: 15px;
-
-	& .current-setting {
-		display: inline-block;
-
-		text-decoration: none;
-
-		color: black;
-	}
-
-	& .rc-button {
-		width: 49%;
-	}
+  & .rc-button {
+    width: 49%
+  }
 }

@@ -1,7 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 Meteor.methods({
 	'livechat:removeCustomField'(_id) {
 		if (!Meteor.userId() || !RocketChat.authz.hasPermission(Meteor.userId(), 'view-livechat-manager')) {
@@ -17,5 +13,5 @@ Meteor.methods({
 		}
 
 		return RocketChat.models.LivechatCustomField.removeById(_id);
-	},
+	}
 });

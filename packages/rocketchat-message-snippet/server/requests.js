@@ -1,7 +1,4 @@
-import { WebApp } from 'meteor/webapp';
-import { Cookies } from 'meteor/ostrio:cookies';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
+/* global Cookies */
 WebApp.connectHandlers.use('/snippet/download', function(req, res) {
 	let rawCookies;
 	let token;
@@ -37,11 +34,11 @@ WebApp.connectHandlers.use('/snippet/download', function(req, res) {
 	if (match[1]) {
 		const snippet = RocketChat.models.Messages.findOne(
 			{
-				_id: match[1],
-				snippeted: true,
+				'_id': match[1],
+				'snippeted': true
 			}
 		);
-		const room = RocketChat.models.Rooms.findOne({ _id: snippet.rid, usernames: { $in: [user.username] } });
+		const room = RocketChat.models.Rooms.findOne({ '_id': snippet.rid, 'usernames': { '$in': [user.username] }});
 		if (room === undefined) {
 			res.writeHead(403);
 			res.end();

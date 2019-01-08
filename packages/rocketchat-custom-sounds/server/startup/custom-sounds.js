@@ -1,10 +1,5 @@
-import { Meteor } from 'meteor/meteor';
-import { WebApp } from 'meteor/webapp';
-import { RocketChatFile } from 'meteor/rocketchat:file';
-import { RocketChat } from 'meteor/rocketchat:lib';
+/* globals RocketChatFileCustomSoundsInstance */
 import _ from 'underscore';
-
-export let RocketChatFileCustomSoundsInstance;
 
 Meteor.startup(function() {
 	let storeType = 'GridFS';
@@ -28,12 +23,14 @@ Meteor.startup(function() {
 		}
 	}
 
-	RocketChatFileCustomSoundsInstance = new RocketChatStore({
+	this.RocketChatFileCustomSoundsInstance = new RocketChatStore({
 		name: 'custom_sounds',
-		absolutePath: path,
+		absolutePath: path
 	});
 
-	return WebApp.connectHandlers.use('/custom-sounds/', Meteor.bindEnvironment(function(req, res/* , next*/) {
+	self = this;
+
+	return WebApp.connectHandlers.use('/custom-sounds/', Meteor.bindEnvironment(function(req, res/*, next*/) {
 		const params =
 			{ sound: decodeURIComponent(req.url.replace(/^\//, '').replace(/\?.*$/, '')) };
 

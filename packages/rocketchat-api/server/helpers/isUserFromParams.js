@@ -1,5 +1,3 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 RocketChat.API.helperMethods.set('isUserFromParams', function _isUserFromParams() {
 	const params = this.requestParams();
 

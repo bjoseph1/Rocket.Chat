@@ -1,4 +1,3 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
 import _ from 'underscore';
 
 if (_.isUndefined(RocketChat.models.Subscriptions)) {
@@ -13,7 +12,7 @@ Object.assign(RocketChat.models.Subscriptions, {
 
 		const query = {
 			rid: roomId,
-			roles: roleName,
+			roles: roleName
 		};
 
 		return !_.isUndefined(this.findOne(query));
@@ -23,7 +22,7 @@ Object.assign(RocketChat.models.Subscriptions, {
 		roles = [].concat(roles);
 
 		const query = {
-			roles: { $in: roles },
+			roles: { $in: roles }
 		};
 
 		if (scope) {
@@ -39,5 +38,5 @@ Object.assign(RocketChat.models.Subscriptions, {
 		}));
 
 		return RocketChat.models.Users.find({ _id: { $in: users } }, options);
-	},
+	}
 });

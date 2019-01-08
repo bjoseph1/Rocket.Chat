@@ -1,5 +1,3 @@
-import { Template } from 'meteor/templating';
-
-Template.registerHelper('log', (...args) => {
-	console.log.apply(console, args);
+Template.registerHelper('log', () => {
+	console.log.apply(console, arguments);
 });

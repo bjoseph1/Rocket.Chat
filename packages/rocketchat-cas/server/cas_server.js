@@ -1,10 +1,5 @@
-import { Meteor } from 'meteor/meteor';
-import { Accounts } from 'meteor/accounts-base';
-import { Random } from 'meteor/random';
-import { WebApp } from 'meteor/webapp';
-import { RocketChat } from 'meteor/rocketchat:lib';
-import { RoutePolicy } from 'meteor/routepolicy';
-import { logger } from './cas_rocketchat';
+/* globals RoutePolicy, logger */
+/* jshint newcap: false */
 import _ from 'underscore';
 
 import fiber from 'fibers';
@@ -14,7 +9,7 @@ import CAS from 'cas';
 RoutePolicy.declare('/_cas/', 'network');
 
 const closePopup = function(res) {
-	res.writeHead(200, { 'Content-Type': 'text/html' });
+	res.writeHead(200, {'Content-Type': 'text/html'});
 	const content = '<html><head><script>window.close()</script></head></html>';
 	res.end(content, 'utf-8');
 };
@@ -38,7 +33,7 @@ const casTicket = function(req, token, callback) {
 	const cas = new CAS({
 		base_url: baseUrl,
 		version: cas_version,
-		service: `${ appUrl }/_cas/${ token }`,
+		service: `${ appUrl }/_cas/${ token }`
 	});
 
 	cas.validate(ticketId, Meteor.bindEnvironment(function(err, status, username, details) {
@@ -56,7 +51,7 @@ const casTicket = function(req, token, callback) {
 		} else {
 			logger.error(`Unable to validate ticket: ${ ticketId }`);
 		}
-		// logger.debug("Receveied response: " + JSON.stringify(details, null , 4));
+		//logger.debug("Receveied response: " + JSON.stringify(details, null , 4));
 
 		callback();
 	}));
@@ -129,7 +124,7 @@ Accounts.registerLoginHandler(function(options) {
 
 	// We have these
 	const ext_attrs = {
-		username: result.username,
+		username: result.username
 	};
 
 	// We need these
@@ -137,7 +132,7 @@ Accounts.registerLoginHandler(function(options) {
 		email: undefined,
 		name: undefined,
 		username: undefined,
-		rooms: undefined,
+		rooms: undefined
 	};
 
 	// Import response attributes
@@ -160,35 +155,19 @@ Accounts.registerLoginHandler(function(options) {
 		_.each(attr_map, function(source, int_name) {
 			// Source is our String to interpolate
 			if (_.isString(source)) {
-				let replacedValue = source;
 				_.each(ext_attrs, function(value, ext_name) {
-					replacedValue = replacedValue.replace(`%${ ext_name }%`, ext_attrs[ext_name]);
+					source = source.replace(`%${ ext_name }%`, ext_attrs[ext_name]);
 				});
 
-				if (source !== replacedValue) {
-					int_attrs[int_name] = replacedValue;
-					logger.debug(`Sourced internal attribute: ${ int_name } = ${ replacedValue }`);
-				} else {
-					logger.debug(`Sourced internal attribute: ${ int_name } skipped.`);
-				}
+				int_attrs[int_name] = source;
+				logger.debug(`Sourced internal attribute: ${ int_name } = ${ source }`);
 			}
 		});
 	}
 
 	// Search existing user by its external service id
 	logger.debug(`Looking up user by id: ${ result.username }`);
-	// First, look for a user that has logged in from CAS with this username before
 	let user = Meteor.users.findOne({ 'services.cas.external_id': result.username });
-	if (!user) {
-		// If that user was not found, check if there's any CAS user that is currently using that username on Rocket.Chat
-		// With this, CAS login will continue to work if the user is renamed on both sides and also if the user is renamed only on Rocket.Chat.
-		const username = new RegExp(`^${ result.username }$`, 'i');
-		user = Meteor.users.findOne({ 'services.cas.external_id': { $exists: true }, username });
-		if (user) {
-			// Update the user's external_id to reflect this new username.
-			Meteor.users.update(user, { $set: { 'services.cas.external_id': result.username } });
-		}
-	}
 
 	if (user) {
 		logger.debug(`Using existing user for '${ result.username }' with id: ${ user._id }`);
@@ -201,7 +180,7 @@ Accounts.registerLoginHandler(function(options) {
 
 			// Update email
 			if (int_attrs.email) {
-				Meteor.users.update(user, { $set: { emails: [{ address: int_attrs.email, verified: true }] } });
+				Meteor.users.update(user, { $set: { emails: [{ address: int_attrs.email, verified: true }] }});
 			}
 		}
 	} else {
@@ -216,22 +195,22 @@ Accounts.registerLoginHandler(function(options) {
 				cas: {
 					external_id: result.username,
 					version: cas_version,
-					attrs: int_attrs,
-				},
-			},
+					attrs: int_attrs
+				}
+			}
 		};
 
 		// Add User.name
 		if (int_attrs.name) {
 			_.extend(newUser, {
-				name: int_attrs.name,
+				name: int_attrs.name
 			});
 		}
 
 		// Add email
 		if (int_attrs.email) {
 			_.extend(newUser, {
-				emails: [{ address: int_attrs.email, verified: true }],
+				emails: [{ address: int_attrs.email, verified: true }]
 			});
 		}
 
@@ -242,7 +221,7 @@ Accounts.registerLoginHandler(function(options) {
 		// Fetch and use it
 		user = Meteor.users.findOne(userId);
 		logger.debug(`Created new user for '${ result.username }' with id: ${ user._id }`);
-		// logger.debug(JSON.stringify(user, undefined, 4));
+		//logger.debug(JSON.stringify(user, undefined, 4));
 
 		logger.debug(`Joining user to attribute channels: ${ int_attrs.rooms }`);
 		if (int_attrs.rooms) {
@@ -252,17 +231,15 @@ Accounts.registerLoginHandler(function(options) {
 					if (!room) {
 						room = RocketChat.models.Rooms.createWithIdTypeAndName(Random.id(), 'c', room_name);
 					}
-
-					if (!RocketChat.models.Subscriptions.findOneByRoomIdAndUserId(room._id, userId)) {
-						RocketChat.models.Subscriptions.createWithRoomAndUser(room, user, {
-							ts: new Date(),
-							open: true,
-							alert: true,
-							unread: 1,
-							userMentions: 1,
-							groupMentions: 0,
-						});
-					}
+					RocketChat.models.Rooms.addUsernameByName(room_name, result.username);
+					RocketChat.models.Subscriptions.createWithRoomAndUser(room, user, {
+						ts: new Date(),
+						open: true,
+						alert: true,
+						unread: 1,
+						userMentions: 1,
+						groupMentions: 0
+					});
 				}
 			});
 		}

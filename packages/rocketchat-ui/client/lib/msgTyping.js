@@ -1,7 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
-import { ReactiveVar } from 'meteor/reactive-var';
-import { Session } from 'meteor/session';
 import _ from 'underscore';
 
 export const MsgTyping = (function() {
@@ -13,24 +9,14 @@ export const MsgTyping = (function() {
 	const usersTyping = {};
 	const dep = new Tracker.Dependency;
 
-	const shownName = function(user) {
-		if (!user) {
-			return;
-		}
-		if (RocketChat.settings.get('UI_Use_Real_Name')) {
-			return user.name;
-		}
-		return user.username;
-	};
-
 	const addStream = function(room) {
 		if (!_.isEmpty(usersTyping[room] && usersTyping[room].users)) {
 			return;
 		}
 		usersTyping[room] = { users: {} };
 		return RocketChat.Notifications.onRoom(room, 'typing', function(username, typing) {
-			const user = Meteor.users.findOne(Meteor.userId(), { fields: { name: 1, username: 1 } });
-			if (username === shownName(user)) {
+			const user = Meteor.user();
+			if (username === (user && user.username)) {
 				return;
 			}
 			const { users } = usersTyping[room];
@@ -57,7 +43,7 @@ export const MsgTyping = (function() {
 			timeouts[room] = null;
 		}
 		const user = Meteor.user();
-		return RocketChat.Notifications.notifyRoom(room, 'typing', shownName(user), false);
+		return RocketChat.Notifications.notifyRoom(room, 'typing', user && user.username, false);
 	};
 	const start = function(room) {
 		if (!renew) { return; }
@@ -67,7 +53,7 @@ export const MsgTyping = (function() {
 		renew = false;
 		selfTyping.set(true);
 		const user = Meteor.user();
-		RocketChat.Notifications.notifyRoom(room, 'typing', shownName(user), true);
+		RocketChat.Notifications.notifyRoom(room, 'typing', user && user.username, true);
 		clearTimeout(timeouts[room]);
 		return timeouts[room] = Meteor.setTimeout(() => stop(room), timeout);
 	};

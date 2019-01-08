@@ -1,7 +1,5 @@
-import { VRecDialog } from './VRecDialog';
-import { Template } from 'meteor/templating';
-import { TAPi18n } from 'meteor/tap:i18n';
-import { VideoRecorder, fileUpload } from 'meteor/rocketchat:ui';
+/* globals VideoRecorder, fileUpload */
+import {VRecDialog} from './VRecDialog';
 
 Template.vrecDialog.helpers({
 	recordIcon() {
@@ -22,7 +20,7 @@ Template.vrecDialog.helpers({
 
 	recordDisabled() {
 		return VideoRecorder.cameraStarted.get() ? '' : 'disabled';
-	},
+	}
 });
 
 
@@ -41,10 +39,10 @@ Template.vrecDialog.events({
 	},
 
 	'click .vrec-dialog .ok'() {
-		const cb = (blob) => {
+		const cb = blob => {
 			fileUpload([{ file: blob, type: 'video', name: `${ TAPi18n.__('Video record') }.webm` }]);
 			VRecDialog.close();
 		};
 		VideoRecorder.stop(cb);
-	},
+	}
 });

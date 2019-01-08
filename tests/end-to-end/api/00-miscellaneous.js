@@ -1,10 +1,15 @@
+/* eslint-env mocha */
+/* globals expect */
+/* eslint no-unused-vars: 0 */
+
 import { getCredentials, api, login, request, credentials } from '../../data/api-data.js';
 import { adminEmail, adminUsername, adminPassword, password } from '../../data/user.js';
+import supertest from 'supertest';
 
 describe('miscellaneous', function() {
 	this.retries(0);
 
-	before((done) => getCredentials(done));
+	before(done => getCredentials(done));
 
 	describe('API default', () => {
 		// Required by mobile apps
@@ -28,19 +33,12 @@ describe('miscellaneous', function() {
 		request.post(api('login'))
 			.send({
 				user: {
-					username: adminUsername,
+					username: adminUsername
 				},
-				password: adminPassword,
+				password: adminPassword
 			})
 			.expect('Content-Type', 'application/json')
 			.expect(200)
-			.expect((res) => {
-				expect(res.body).to.have.property('status', 'success');
-				expect(res.body).to.have.property('data').and.to.be.an('object');
-				expect(res.body.data).to.have.property('userId');
-				expect(res.body.data).to.have.property('authToken');
-				expect(res.body.data).to.have.property('me');
-			})
 			.end(done);
 	});
 
@@ -48,55 +46,12 @@ describe('miscellaneous', function() {
 		request.post(api('login'))
 			.send({
 				user: {
-					email: adminEmail,
+					email: adminEmail
 				},
-				password: adminPassword,
+				password: adminPassword
 			})
 			.expect('Content-Type', 'application/json')
 			.expect(200)
-			.expect((res) => {
-				expect(res.body).to.have.property('status', 'success');
-				expect(res.body).to.have.property('data').and.to.be.an('object');
-				expect(res.body.data).to.have.property('userId');
-				expect(res.body.data).to.have.property('authToken');
-				expect(res.body.data).to.have.property('me');
-			})
-			.end(done);
-	});
-
-	it('/login by user', (done) => {
-		request.post(api('login'))
-			.send({
-				user: adminEmail,
-				password: adminPassword,
-			})
-			.expect('Content-Type', 'application/json')
-			.expect(200)
-			.expect((res) => {
-				expect(res.body).to.have.property('status', 'success');
-				expect(res.body).to.have.property('data').and.to.be.an('object');
-				expect(res.body.data).to.have.property('userId');
-				expect(res.body.data).to.have.property('authToken');
-				expect(res.body.data).to.have.property('me');
-			})
-			.end(done);
-	});
-
-	it('/login by username', (done) => {
-		request.post(api('login'))
-			.send({
-				username: adminUsername,
-				password: adminPassword,
-			})
-			.expect('Content-Type', 'application/json')
-			.expect(200)
-			.expect((res) => {
-				expect(res.body).to.have.property('status', 'success');
-				expect(res.body).to.have.property('data').and.to.be.an('object');
-				expect(res.body.data).to.have.property('userId');
-				expect(res.body.data).to.have.property('authToken');
-				expect(res.body.data).to.have.property('me');
-			})
 			.end(done);
 	});
 
@@ -106,12 +61,6 @@ describe('miscellaneous', function() {
 			.expect('Content-Type', 'application/json')
 			.expect(200)
 			.expect((res) => {
-				const allUserPreferencesKeys = ['enableAutoAway', 'idleTimeLimit', 'desktopNotificationDuration', 'audioNotifications',
-					'desktopNotifications', 'mobileNotifications', 'unreadAlert', 'useEmojis', 'convertAsciiEmoji', 'autoImageLoad',
-					'saveMobileBandwidth', 'collapseMediaByDefault', 'hideUsernames', 'hideRoles', 'hideFlexTab', 'hideAvatars',
-					'sidebarViewMode', 'sidebarHideAvatar', 'sidebarShowUnread', 'sidebarShowFavorites', 'sidebarGroupByType',
-					'sendOnEnter', 'messageViewMode', 'emailNotificationMode', 'roomCounterSidebar', 'newRoomNotification', 'newMessageNotification',
-					'muteFocusedConversations', 'notificationsSoundVolume'];
 				expect(res.body).to.have.property('success', true);
 				expect(res.body).to.have.property('_id', credentials['X-User-Id']);
 				expect(res.body).to.have.property('username', login.user);
@@ -120,7 +69,6 @@ describe('miscellaneous', function() {
 				expect(res.body).to.have.property('roles').and.to.be.an('array');
 				expect(res.body).to.have.nested.property('emails[0].address', adminEmail);
 				expect(res.body).to.have.nested.property('settings.preferences').and.to.be.an('object');
-				expect(res.body.settings.preferences).to.have.all.keys(allUserPreferencesKeys);
 			})
 			.end(done);
 	});
@@ -139,9 +87,9 @@ describe('miscellaneous', function() {
 					done();
 				});
 		});
-		after((done) => {
+		after(done => {
 			request.post(api('users.delete')).set(credentials).send({
-				userId: user._id,
+				userId: user._id
 			}).end(done);
 			user = undefined;
 		});
@@ -149,7 +97,7 @@ describe('miscellaneous', function() {
 			request.post(api('channels.create'))
 				.set(credentials)
 				.send({
-					name: `channel.test.${ Date.now() }`,
+					name: `channel.test.${ Date.now() }`
 				})
 				.end((err, res) => {
 					testChannel = res.body.channel;
@@ -162,17 +110,14 @@ describe('miscellaneous', function() {
 				.query({
 					query: JSON.stringify({
 						text: user.username,
-						type: 'users',
-					}),
+						type: 'users'
+					})
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.property('result').and.to.be.an('array');
-					expect(res.body).to.have.property('offset');
-					expect(res.body).to.have.property('total');
-					expect(res.body).to.have.property('count');
 					expect(res.body.result[0]).to.have.property('_id');
 					expect(res.body.result[0]).to.have.property('createdAt');
 					expect(res.body.result[0]).to.have.property('username');
@@ -187,79 +132,30 @@ describe('miscellaneous', function() {
 				.query({
 					query: JSON.stringify({
 						text: testChannel.name,
-						type: 'channels',
-					}),
+						type: 'channels'
+					})
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
-					expect(res.body).to.have.property('offset');
-					expect(res.body).to.have.property('total');
-					expect(res.body).to.have.property('count');
 					expect(res.body).to.have.property('result').and.to.be.an('array');
 					expect(res.body.result[0]).to.have.property('_id');
 					expect(res.body.result[0]).to.have.property('name');
-					expect(res.body.result[0]).to.have.property('usersCount').and.to.be.an('number');
+					expect(res.body.result[0]).to.have.property('usernames').and.to.be.an('array');
 					expect(res.body.result[0]).to.have.property('ts');
 				})
 				.end(done);
 		});
-		it('should return an array(result) when search by channel with sort params correctly and execute succesfully', (done) => {
-			request.get(api('directory'))
-				.set(credentials)
-				.query({
-					query: JSON.stringify({
-						text: testChannel.name,
-						type: 'channels',
-					}),
-					sort: JSON.stringify(({
-						name: 1,
-					})),
-				})
-				.expect('Content-Type', 'application/json')
-				.expect(200)
-				.expect((res) => {
-					expect(res.body).to.have.property('success', true);
-					expect(res.body).to.have.property('offset');
-					expect(res.body).to.have.property('total');
-					expect(res.body).to.have.property('count');
-					expect(res.body).to.have.property('result').and.to.be.an('array');
-					expect(res.body.result[0]).to.have.property('_id');
-					expect(res.body.result[0]).to.have.property('name');
-					expect(res.body.result[0]).to.have.property('usersCount').and.to.be.an('number');
-					expect(res.body.result[0]).to.have.property('ts');
-				})
-				.end(done);
-		});
+
 		it('should return an error when send invalid query', (done) => {
 			request.get(api('directory'))
 				.set(credentials)
 				.query({
 					query: JSON.stringify({
 						text: 'invalid channel',
-						type: 'invalid',
-					}),
-				})
-				.expect('Content-Type', 'application/json')
-				.expect(400)
-				.expect((res) => {
-					expect(res.body).to.have.property('success', false);
-				})
-				.end(done);
-		});
-		it('should return an error when have more than one sort parameter', (done) => {
-			request.get(api('directory'))
-				.set(credentials)
-				.query({
-					query: JSON.stringify({
-						text: testChannel.name,
-						type: 'channels',
-					}),
-					sort: JSON.stringify(({
-						name: 1,
-						test: 1,
-					})),
+						type: 'invalid'
+					})
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(400)
@@ -289,7 +185,7 @@ describe('miscellaneous', function() {
 			request.post(api('login'))
 				.send({
 					user: user.username,
-					password,
+					password
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -300,9 +196,9 @@ describe('miscellaneous', function() {
 				})
 				.end(done);
 		});
-		after((done) => {
+		after(done => {
 			request.post(api('users.delete')).set(credentials).send({
-				userId: user._id,
+				userId: user._id
 			}).end(done);
 			user = undefined;
 		});
@@ -310,7 +206,7 @@ describe('miscellaneous', function() {
 			request.post(api('channels.create'))
 				.set(userCredentials)
 				.send({
-					name: `channel.test.${ Date.now() }`,
+					name: `channel.test.${ Date.now() }`
 				})
 				.end((err, res) => {
 					testChannel = res.body.channel;
@@ -331,7 +227,7 @@ describe('miscellaneous', function() {
 		it('should return object inside users array when search by a valid user', (done) => {
 			request.get(api('spotlight'))
 				.query({
-					query: `@${ adminUsername }`,
+					query: `@${ adminUsername }`
 				})
 				.set(credentials)
 				.expect('Content-Type', 'application/json')
@@ -350,7 +246,7 @@ describe('miscellaneous', function() {
 		it('must return the object inside the room array when searching for a valid room and that user is not a member of it', (done) => {
 			request.get(api('spotlight'))
 				.query({
-					query: `#${ testChannel.name }`,
+					query: `#${ testChannel.name }`
 				})
 				.set(credentials)
 				.expect('Content-Type', 'application/json')

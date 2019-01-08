@@ -1,10 +1,7 @@
-import { Meteor } from 'meteor/meteor';
-import { Match, check } from 'meteor/check';
-import { RocketChat } from 'meteor/rocketchat:lib';
 import LivechatVisitors from '../models/LivechatVisitors';
 
 Meteor.methods({
-	sendMessageLivechat({ token, _id, rid, msg, attachments }, agent) {
+	sendMessageLivechat({ token, _id, rid, msg }, agent) {
 		check(token, String);
 		check(_id, String);
 		check(rid, String);
@@ -12,7 +9,7 @@ Meteor.methods({
 
 		check(agent, Match.Maybe({
 			agentId: String,
-			username: String,
+			username: String
 		}));
 
 		const guest = LivechatVisitors.getVisitorByToken(token, {
@@ -20,8 +17,8 @@ Meteor.methods({
 				name: 1,
 				username: 1,
 				department: 1,
-				token: 1,
-			},
+				token: 1
+			}
 		});
 
 		if (!guest) {
@@ -34,10 +31,9 @@ Meteor.methods({
 				_id,
 				rid,
 				msg,
-				token,
-				attachments,
+				token
 			},
-			agent,
+			agent
 		});
-	},
+	}
 });

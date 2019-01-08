@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
 import LDAP from './ldap';
 
 Meteor.methods({
@@ -34,7 +32,7 @@ Meteor.methods({
 
 		return {
 			message: 'Connection_success',
-			params: [],
+			params: []
 		};
-	},
+	}
 });

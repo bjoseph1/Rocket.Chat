@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { ReactiveVar } from 'meteor/reactive-var';
-import { RocketChat } from 'meteor/rocketchat:lib';
 import _ from 'underscore';
 
 class CustomSounds {
@@ -65,11 +62,9 @@ class CustomSounds {
 RocketChat.CustomSounds = new CustomSounds;
 
 Meteor.startup(() =>
-	RocketChat.CachedCollectionManager.onLogin(() => {
-		Meteor.call('listCustomSounds', (error, result) => {
-			for (const sound of result) {
-				RocketChat.CustomSounds.add(sound);
-			}
-		});
+	Meteor.call('listCustomSounds', (error, result) => {
+		for (const sound of result) {
+			RocketChat.CustomSounds.add(sound);
+		}
 	})
 );

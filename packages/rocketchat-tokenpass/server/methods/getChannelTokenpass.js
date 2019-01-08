@@ -1,7 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 Meteor.methods({
 	getChannelTokenpass(rid) {
 		check(rid, String);
@@ -17,5 +13,5 @@ Meteor.methods({
 		}
 
 		return room.tokenpass;
-	},
+	}
 });

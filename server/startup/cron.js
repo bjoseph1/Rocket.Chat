@@ -1,8 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { HTTP } from 'meteor/http';
-import { Logger } from 'meteor/rocketchat:logger';
-import { getWorkspaceAccessToken } from 'meteor/rocketchat:cloud';
-import { SyncedCron } from 'meteor/littledata:synced-cron';
+/* global SyncedCron */
 
 const logger = new Logger('SyncedCron');
 
@@ -10,7 +6,7 @@ SyncedCron.config({
 	logger(opts) {
 		return logger[opts.level].call(logger, opts.message);
 	},
-	collectionName: 'rocketchat_cron_history',
+	collectionName: 'rocketchat_cron_history'
 });
 
 function generateStatistics() {
@@ -20,19 +16,11 @@ function generateStatistics() {
 
 	if (RocketChat.settings.get('Statistics_reporting')) {
 		try {
-			const headers = {};
-			const token = getWorkspaceAccessToken();
-
-			if (token) {
-				headers.Authorization = `Bearer ${ token }`;
-			}
-
 			HTTP.post('https://collector.rocket.chat/', {
-				data: statistics,
-				headers,
+				data: statistics
 			});
 		} catch (error) {
-			/* error*/
+			/*error*/
 			logger.warn('Failed to send usage report');
 		}
 	}
@@ -51,7 +39,7 @@ Meteor.startup(function() {
 			schedule(parser) {
 				return parser.cron(`${ new Date().getMinutes() } * * * *`);
 			},
-			job: generateStatistics,
+			job: generateStatistics
 		});
 
 		SyncedCron.add({
@@ -60,7 +48,7 @@ Meteor.startup(function() {
 				const now = new Date();
 				return parser.cron(`${ now.getMinutes() } ${ now.getHours() } * * *`);
 			},
-			job: cleanupOEmbedCache,
+			job: cleanupOEmbedCache
 		});
 
 		return SyncedCron.start();
