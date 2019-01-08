@@ -1,5 +1,5 @@
-_caddy-url_
-proxy / localhost:_port_ {
+http://:8080
+proxy / localhost:3000 {
   websocket
   transparent
 }

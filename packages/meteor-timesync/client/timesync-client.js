@@ -1,11 +1,8 @@
-import { Meteor } from 'meteor/meteor';
-import { Deps } from 'meteor/deps';
-import { HTTP } from 'meteor/http';
-
+/* eslint-disable */
 //IE8 doesn't have Date.now()
 Date.now = Date.now || function() { return +new Date; };
 
-export const TimeSync = {
+TimeSync = {
   loggingEnabled: true
 };
 
@@ -18,7 +15,7 @@ function log(/* arguments */) {
 var defaultInterval = 1000;
 
 // Internal values, exported for testing
-export const SyncInternals = {
+SyncInternals = {
   offset: undefined,
   roundTripTime: undefined,
   offsetDep: new Deps.Dependency(),

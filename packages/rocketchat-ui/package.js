@@ -7,7 +7,7 @@ Package.describe({
 	git: '',
 	// By default, Meteor will default to using README.md for documentation.
 	// To avoid submitting documentation, set this field to null.
-	documentation: 'README.md',
+	documentation: 'README.md'
 });
 
 Package.onUse(function(api) {
@@ -22,19 +22,11 @@ Package.onUse(function(api) {
 		'templating',
 		'rocketchat:lib',
 		'rocketchat:ui-master',
-		'rocketchat:push',
-		'rocketchat:utils',
-		'raix:ui-dropped-event',
-		'rocketchat:lazy-load',
-		'rocketchat:e2e',
-		'mizzao:autocomplete',
-		'rocketchat:file-upload',
-		'konecty:user-presence',
-		'rocketchat:webrtc',
+		'raix:push',
+		'raix:ui-dropped-event'
 	]);
 
 	api.use('kadira:flow-router', 'client');
-	api.use('kadira:blaze-layout', 'client');
 
 	api.addFiles('getAvatarUrlFromUsername.js');
 
@@ -59,6 +51,7 @@ Package.onUse(function(api) {
 	api.addFiles('client/lib/RoomHistoryManager.js', 'client');
 	api.addFiles('client/lib/RoomManager.js', 'client');
 	api.addFiles('client/lib/sideNav.js', 'client');
+	api.addFiles('client/lib/tapi18n.js', 'client');
 	api.addFiles('client/lib/textarea-autogrow.js', 'client');
 
 	api.addFiles('client/lib/codeMirror/codeMirror.js', 'client');
@@ -130,12 +123,6 @@ Package.onUse(function(api) {
 	api.addFiles('client/components/icon.html', 'client');
 	api.addFiles('client/components/icon.js', 'client');
 
-	api.addFiles('client/components/table.html', 'client');
-	api.addFiles('client/components/table.js', 'client');
-
-	api.addFiles('client/components/tabs.html', 'client');
-	api.addFiles('client/components/tabs.js', 'client');
-
 	api.addFiles('client/components/popupList.html', 'client');
 	api.addFiles('client/components/popupList.js', 'client');
 
@@ -149,27 +136,4 @@ Package.onUse(function(api) {
 	api.addFiles('client/components/contextualBar.js', 'client');
 
 	api.export('fileUpload');
-	api.export('modal', 'client');
-	api.export('popover', 'client');
-	api.export('fireGlobalEvent', 'client');
-	api.export('ChatRoom', 'client');
-	api.export('ChatSubscription', 'client');
-	api.export('RoomRoles', 'client');
-	api.export('SideNav', 'client');
-	api.export('ChatMessages', 'client');
-	api.export('RoomManager', 'client');
-	api.export('getAvatarUrlFromUsername');
-	api.export('popout', 'client');
-	api.export('ChatMessage', 'client');
-	api.export('RoomHistoryManager', 'client');
-	api.export('KonchatNotification', 'client');
-	api.export('AudioRecorder', 'client');
-	api.export('VideoRecorder', 'client');
-	api.export('UserRoles', 'client');
-	api.export('alerts', 'client');
-	api.export('AccountBox', 'client');
-	api.export('chatMessages', 'client');
-	api.export('CachedChatSubscription', 'client');
-	api.export('readMessage', 'client');
-	api.export('updateAvatarOfUsername', 'client');
 });

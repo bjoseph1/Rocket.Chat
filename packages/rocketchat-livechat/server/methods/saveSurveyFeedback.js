@@ -1,6 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { Match, check } from 'meteor/check';
-import { RocketChat } from 'meteor/rocketchat:lib';
+/* eslint new-cap: [2, {"capIsNewExceptions": ["Match.ObjectIncluding"]}] */
 import LivechatVisitors from '../models/LivechatVisitors';
 import _ from 'underscore';
 
@@ -26,5 +24,5 @@ Meteor.methods({
 				return RocketChat.models.Rooms.updateSurveyFeedbackById(room._id, updateData);
 			}
 		}
-	},
+	}
 });

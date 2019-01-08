@@ -1,48 +1,61 @@
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
-import * as Mailer from 'meteor/rocketchat:mailer';
-
-let html = '';
-Meteor.startup(() => {
-	Mailer.getTemplate('Invitation_Email', (value) => {
-		html = value;
-	});
-});
+import _ from 'underscore';
 
 Meteor.methods({
 	sendInvitationEmail(emails) {
 		check(emails, [String]);
 		if (!Meteor.userId()) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-				method: 'sendInvitationEmail',
+				method: 'sendInvitationEmail'
 			});
 		}
-		if (!RocketChat.authz.hasPermission(Meteor.userId(), 'bulk-register-user')) {
+		if (!RocketChat.authz.hasRole(Meteor.userId(), 'admin')) {
 			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
-				method: 'sendInvitationEmail',
+				method: 'sendInvitationEmail'
 			});
 		}
-		const validEmails = emails.filter(Mailer.checkAddressFormat);
-
-		const subject = RocketChat.settings.get('Invitation_Subject');
-
-		return validEmails.filter((email) => {
+		const rfcMailPattern = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+		const validEmails = _.compact(_.map(emails, function(email) {
+			if (rfcMailPattern.test(email)) {
+				return email;
+			}
+		}));
+		const header = RocketChat.placeholders.replace(RocketChat.settings.get('Email_Header') || '');
+		const footer = RocketChat.placeholders.replace(RocketChat.settings.get('Email_Footer') || '');
+		let html;
+		let subject;
+		const user = Meteor.user();
+		const lng = user.language || RocketChat.settings.get('language') || 'en';
+		if (RocketChat.settings.get('Invitation_Customized')) {
+			subject = RocketChat.settings.get('Invitation_Subject');
+			html = RocketChat.settings.get('Invitation_HTML');
+		} else {
+			subject = TAPi18n.__('Invitation_Subject_Default', {
+				lng
+			});
+			html = TAPi18n.__('Invitation_HTML_Default', {
+				lng
+			});
+		}
+		subject = RocketChat.placeholders.replace(subject);
+		validEmails.forEach(email => {
+			this.unblock();
+			html = RocketChat.placeholders.replace(html, {
+				email
+			});
 			try {
-				return Mailer.send({
+				Email.send({
 					to: email,
 					from: RocketChat.settings.get('From_Email'),
 					subject,
-					html,
-					data: {
-						email,
-					},
+					html: header + html + footer
 				});
-			} catch ({ message }) {
+			} catch ({message}) {
 				throw new Meteor.Error('error-email-send-failed', `Error trying to send email: ${ message }`, {
 					method: 'sendInvitationEmail',
-					message,
+					message
 				});
 			}
 		});
-	},
+		return validEmails;
+	}
 });

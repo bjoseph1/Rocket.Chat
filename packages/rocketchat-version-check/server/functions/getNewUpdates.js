@@ -1,14 +1,12 @@
+/* global MongoInternals */
 import os from 'os';
 import { HTTP } from 'meteor/http';
-import { RocketChat } from 'meteor/rocketchat:lib';
-import { getWorkspaceAccessToken } from 'meteor/rocketchat:cloud';
-import { MongoInternals } from 'meteor/mongo';
 // import checkUpdate from '../checkUpdate';
 
 export default () => {
 	try {
 		const uniqueID = RocketChat.models.Settings.findOne('uniqueID');
-		const { _oplogHandle } = MongoInternals.defaultRemoteCollectionDriver().mongo;
+		const _oplogHandle = MongoInternals.defaultRemoteCollectionDriver().mongo._oplogHandle;
 		const oplogEnabled = _oplogHandle && _oplogHandle.onOplogEntry && RocketChat.settings.get('Force_Disable_OpLog_For_Cache') !== true;
 
 		const data = {
@@ -22,18 +20,11 @@ export default () => {
 			osRelease: os.release(),
 			nodeVersion: process.version,
 			deployMethod: process.env.DEPLOY_METHOD || 'tar',
-			deployPlatform: process.env.DEPLOY_PLATFORM || 'selfinstall',
+			deployPlatform: process.env.DEPLOY_PLATFORM || 'selfinstall'
 		};
 
-		const headers = {};
-		const token = getWorkspaceAccessToken();
-		if (token) {
-			headers.Authorization = `Bearer ${ token }`;
-		}
-
 		const result = HTTP.get('https://releases.rocket.chat/updates/check', {
-			params: data,
-			headers,
+			params: data
 		});
 
 		return result.data;
@@ -44,7 +35,7 @@ export default () => {
 
 		return {
 			versions: [],
-			alerts: [],
+			alerts: []
 		};
 	}
 };

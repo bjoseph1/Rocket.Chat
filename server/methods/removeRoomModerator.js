@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
-
 Meteor.methods({
 	removeRoomModerator(rid, userId) {
 		check(rid, String);
@@ -8,13 +5,13 @@ Meteor.methods({
 
 		if (!Meteor.userId()) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-				method: 'removeRoomModerator',
+				method: 'removeRoomModerator'
 			});
 		}
 
 		if (!RocketChat.authz.hasPermission(Meteor.userId(), 'set-moderator', rid)) {
 			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
-				method: 'removeRoomModerator',
+				method: 'removeRoomModerator'
 			});
 		}
 
@@ -22,7 +19,7 @@ Meteor.methods({
 
 		if (!user || !user.username) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-				method: 'removeRoomModerator',
+				method: 'removeRoomModerator'
 			});
 		}
 
@@ -30,13 +27,13 @@ Meteor.methods({
 
 		if (!subscription) {
 			throw new Meteor.Error('error-invalid-room', 'Invalid room', {
-				method: 'removeRoomModerator',
+				method: 'removeRoomModerator'
 			});
 		}
 
 		if (Array.isArray(subscription.roles) === false || subscription.roles.includes('moderator') === false) {
 			throw new Meteor.Error('error-user-not-moderator', 'User is not a moderator', {
-				method: 'removeRoomModerator',
+				method: 'removeRoomModerator'
 			});
 		}
 
@@ -47,9 +44,9 @@ Meteor.methods({
 		RocketChat.models.Messages.createSubscriptionRoleRemovedWithRoomIdAndUser(rid, user, {
 			u: {
 				_id: fromUser._id,
-				username: fromUser.username,
+				username: fromUser.username
 			},
-			role: 'moderator',
+			role: 'moderator'
 		});
 
 		if (RocketChat.settings.get('UI_DisplayRoles')) {
@@ -59,12 +56,12 @@ Meteor.methods({
 				u: {
 					_id: user._id,
 					username: user.username,
-					name: user.name,
+					name: user.name
 				},
-				scope: rid,
+				scope: rid
 			});
 		}
 
 		return true;
-	},
+	}
 });

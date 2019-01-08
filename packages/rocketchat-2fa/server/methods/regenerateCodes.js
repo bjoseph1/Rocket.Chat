@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 Meteor.methods({
 	'2fa:regenerateCodes'(userToken) {
 		if (!Meteor.userId()) {
@@ -17,7 +14,7 @@ Meteor.methods({
 			secret: user.services.totp.secret,
 			token: userToken,
 			userId: Meteor.userId(),
-			backupTokens: user.services.totp.hashedBackup,
+			backupTokens: user.services.totp.hashedBackup
 		});
 
 		if (verified) {
@@ -26,5 +23,5 @@ Meteor.methods({
 			RocketChat.models.Users.update2FABackupCodesByUserId(Meteor.userId(), hashedCodes);
 			return { codes };
 		}
-	},
+	}
 });

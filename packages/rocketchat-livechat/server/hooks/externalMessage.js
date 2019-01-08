@@ -1,7 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-import { SystemLogger } from 'meteor/rocketchat:logger';
-import { HTTP } from 'meteor/http';
+/* globals HTTP, SystemLogger */
 import _ from 'underscore';
 
 let knowledgeEnabled = false;
@@ -42,12 +39,12 @@ RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
 				data: {
 					query: message.msg,
 					lang: apiaiLanguage,
-					sessionId: room._id,
+					sessionId: room._id
 				},
 				headers: {
 					'Content-Type': 'application/json; charset=utf-8',
-					Authorization: `Bearer ${ apiaiKey }`,
-				},
+					'Authorization': `Bearer ${ apiaiKey }`
+				}
 			});
 
 			if (response.data && response.data.status.code === 200 && !_.isEmpty(response.data.result.fulfillment.speech)) {
@@ -55,7 +52,7 @@ RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
 					rid: message.rid,
 					msg: response.data.result.fulfillment.speech,
 					orig: message._id,
-					ts: new Date(),
+					ts: new Date()
 				});
 			}
 		} catch (e) {

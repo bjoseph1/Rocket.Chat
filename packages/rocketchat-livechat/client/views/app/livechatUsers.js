@@ -1,10 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { Mongo } from 'meteor/mongo';
-import { Template } from 'meteor/templating';
-import { modal } from 'meteor/rocketchat:ui';
-import { t } from 'meteor/rocketchat:utils';
-import { handleError } from 'meteor/rocketchat:lib';
-import { AgentUsers } from '../../collections/AgentUsers';
 import _ from 'underscore';
 import toastr from 'toastr';
 let ManagerUsers;
@@ -38,13 +31,13 @@ Template.livechatUsers.helpers({
 				noMatchTemplate: Template.userSearchEmpty,
 				matchAll: true,
 				filter: {
-					exceptions: _.map(AgentUsers.find({}, { fields: { username: 1 } }).fetch(), (user) => user.username),
+					exceptions: _.map(AgentUsers.find({}, { fields: { username: 1 } }).fetch(), user => { return user.username; })
 				},
 				selector(match) {
 					return { term: match };
 				},
-				sort: 'username',
-			}],
+				sort: 'username'
+			}]
 		};
 	},
 	managerAutocompleteSettings() {
@@ -60,19 +53,19 @@ Template.livechatUsers.helpers({
 				noMatchTemplate: Template.userSearchEmpty,
 				matchAll: true,
 				filter: {
-					exceptions: _.map(ManagerUsers.find({}, { fields: { username: 1 } }).fetch(), (user) => user.username),
+					exceptions: _.map(ManagerUsers.find({}, { fields: { username: 1 } }).fetch(), user => { return user.username; })
 				},
 				selector(match) {
 					return { term: match };
 				},
-				sort: 'username',
-			}],
+				sort: 'username'
+			}]
 		};
-	},
+	}
 });
 
 Template.livechatUsers.events({
-	'click .remove-manager'(e/* , instance*/) {
+	'click .remove-manager'(e/*, instance*/) {
 		e.preventDefault();
 
 		modal.open({
@@ -83,9 +76,9 @@ Template.livechatUsers.events({
 			confirmButtonText: t('Yes'),
 			cancelButtonText: t('Cancel'),
 			closeOnConfirm: false,
-			html: false,
+			html: false
 		}, () => {
-			Meteor.call('livechat:removeManager', this.username, function(error/* , result*/) {
+			Meteor.call('livechat:removeManager', this.username, function(error/*, result*/) {
 				if (error) {
 					return handleError(error);
 				}
@@ -94,12 +87,12 @@ Template.livechatUsers.events({
 					text: t('Manager_removed'),
 					type: 'success',
 					timer: 1000,
-					showConfirmButton: false,
+					showConfirmButton: false
 				});
 			});
 		});
 	},
-	'click .remove-agent'(e/* , instance*/) {
+	'click .remove-agent'(e/*, instance*/) {
 		e.preventDefault();
 
 		modal.open({
@@ -110,9 +103,9 @@ Template.livechatUsers.events({
 			confirmButtonText: t('Yes'),
 			cancelButtonText: t('Cancel'),
 			closeOnConfirm: false,
-			html: false,
+			html: false
 		}, () => {
-			Meteor.call('livechat:removeAgent', this.username, function(error/* , result*/) {
+			Meteor.call('livechat:removeAgent', this.username, function(error/*, result*/) {
 				if (error) {
 					return handleError(error);
 				}
@@ -121,12 +114,12 @@ Template.livechatUsers.events({
 					text: t('Agent_removed'),
 					type: 'success',
 					timer: 1000,
-					showConfirmButton: false,
+					showConfirmButton: false
 				});
 			});
 		});
 	},
-	'submit #form-manager'(e/* , instance*/) {
+	'submit #form-manager'(e/*, instance*/) {
 		e.preventDefault();
 
 		if (e.currentTarget.elements.username.value.trim() === '') {
@@ -137,7 +130,7 @@ Template.livechatUsers.events({
 
 		e.currentTarget.elements.add.value = t('Saving');
 
-		Meteor.call('livechat:addManager', e.currentTarget.elements.username.value, function(error/* , result*/) {
+		Meteor.call('livechat:addManager', e.currentTarget.elements.username.value, function(error/*, result*/) {
 			e.currentTarget.elements.add.value = oldBtnValue;
 			if (error) {
 				return handleError(error);
@@ -147,7 +140,7 @@ Template.livechatUsers.events({
 			e.currentTarget.reset();
 		});
 	},
-	'submit #form-agent'(e/* , instance*/) {
+	'submit #form-agent'(e/*, instance*/) {
 		e.preventDefault();
 
 		if (e.currentTarget.elements.username.value.trim() === '') {
@@ -158,7 +151,7 @@ Template.livechatUsers.events({
 
 		e.currentTarget.elements.add.value = t('Saving');
 
-		Meteor.call('livechat:addAgent', e.currentTarget.elements.username.value, function(error/* , result*/) {
+		Meteor.call('livechat:addAgent', e.currentTarget.elements.username.value, function(error/*, result*/) {
 			e.currentTarget.elements.add.value = oldBtnValue;
 			if (error) {
 				return handleError(error);
@@ -167,7 +160,7 @@ Template.livechatUsers.events({
 			toastr.success(t('Agent_added'));
 			e.currentTarget.reset();
 		});
-	},
+	}
 });
 
 Template.livechatUsers.onCreated(function() {

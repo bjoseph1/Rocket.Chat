@@ -1,4 +1,3 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
 import _ from 'underscore';
 
 RocketChat.models.Subscriptions.roleBaseQuery = function(userId, scope) {
@@ -17,7 +16,7 @@ RocketChat.models.Subscriptions.findUsersInRoles = function(roles, scope, option
 	roles = [].concat(roles);
 
 	const query = {
-		roles: { $in: roles },
+		roles: { $in: roles }
 	};
 
 	if (scope) {

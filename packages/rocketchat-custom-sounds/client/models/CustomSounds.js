@@ -1,5 +1,3 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 class CustomSounds extends RocketChat.models._Base {
 	constructor() {
 		super();

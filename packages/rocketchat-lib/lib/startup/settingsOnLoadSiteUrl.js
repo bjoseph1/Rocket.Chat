@@ -1,6 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { WebAppInternals } from 'meteor/webapp';
-
+/* globals WebAppInternals */
 RocketChat.settings.get('Site_Url', function(key, value) {
 	if (value == null || value.trim() === '') {
 		return;

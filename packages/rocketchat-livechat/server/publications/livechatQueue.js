@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 Meteor.publish('livechat:queue', function() {
 	if (!this.userId) {
 		return this.error(new Meteor.Error('error-not-authorized', 'Not authorized', { publish: 'livechat:queue' }));
@@ -38,7 +35,7 @@ Meteor.publish('livechat:queue', function() {
 		},
 		removed(id) {
 			self.removed('livechatQueueUser', id);
-		},
+		}
 	});
 
 	this.ready();

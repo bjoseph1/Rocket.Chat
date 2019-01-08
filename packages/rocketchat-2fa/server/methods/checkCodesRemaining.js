@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-
 Meteor.methods({
 	'2fa:checkCodesRemaining'() {
 		if (!Meteor.userId()) {
@@ -13,7 +11,7 @@ Meteor.methods({
 		}
 
 		return {
-			remaining: user.services.totp.hashedBackup.length,
+			remaining: user.services.totp.hashedBackup.length
 		};
-	},
+	}
 });

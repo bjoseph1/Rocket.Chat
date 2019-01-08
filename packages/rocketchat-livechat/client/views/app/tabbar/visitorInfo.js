@@ -1,12 +1,5 @@
-import { Meteor } from 'meteor/meteor';
-import { ReactiveVar } from 'meteor/reactive-var';
-import { FlowRouter } from 'meteor/kadira:flow-router';
-import { Session } from 'meteor/session';
-import { Template } from 'meteor/templating';
-import { RocketChat, handleError } from 'meteor/rocketchat:lib';
-import { modal, ChatRoom } from 'meteor/rocketchat:ui';
-import { t } from 'meteor/rocketchat:utils';
-import { LivechatVisitor } from '../../../collections/LivechatVisitor';
+/* globals LivechatVisitor */
+
 import _ from 'underscore';
 import s from 'underscore.string';
 import moment from 'moment';
@@ -27,9 +20,8 @@ Template.visitorInfo.helpers({
 			}
 			user.browser = `${ ua.getBrowser().name } ${ ua.getBrowser().version }`;
 			user.browserIcon = `icon-${ ua.getBrowser().name.toLowerCase() }`;
-
-			user.status = RocketChat.roomTypes.getUserStatus('l', this.rid) || 'offline';
 		}
+
 		return user;
 	},
 
@@ -106,7 +98,7 @@ Template.visitorInfo.helpers({
 			},
 			cancel() {
 				instance.action.set();
-			},
+			}
 		};
 	},
 
@@ -121,7 +113,7 @@ Template.visitorInfo.helpers({
 			},
 			cancel() {
 				instance.action.set();
-			},
+			}
 		};
 	},
 
@@ -152,7 +144,7 @@ Template.visitorInfo.helpers({
 			return subscription !== undefined;
 		}
 		return false;
-	},
+	}
 });
 
 Template.visitorInfo.events({
@@ -169,7 +161,7 @@ Template.visitorInfo.events({
 			type: 'input',
 			inputPlaceholder: t('Please_add_a_comment'),
 			showCancelButton: true,
-			closeOnConfirm: false,
+			closeOnConfirm: false
 		}, (inputValue) => {
 			if (!inputValue) {
 				modal.showInputError(t('Please_add_a_comment_to_close_the_room'));
@@ -181,7 +173,7 @@ Template.visitorInfo.events({
 				return false;
 			}
 
-			Meteor.call('livechat:closeRoom', this.rid, inputValue, function(error/* , result*/) {
+			Meteor.call('livechat:closeRoom', this.rid, inputValue, function(error/*, result*/) {
 				if (error) {
 					return handleError(error);
 				}
@@ -190,7 +182,7 @@ Template.visitorInfo.events({
 					text: t('Chat_closed_successfully'),
 					type: 'success',
 					timer: 1000,
-					showConfirmButton: false,
+					showConfirmButton: false
 				});
 			});
 		});
@@ -205,9 +197,9 @@ Template.visitorInfo.events({
 			showCancelButton: true,
 			confirmButtonColor: '#3085d6',
 			cancelButtonColor: '#d33',
-			confirmButtonText: t('Yes'),
+			confirmButtonText: t('Yes')
 		}, () => {
-			Meteor.call('livechat:returnAsInquiry', this.rid, function(error/* , result*/) {
+			Meteor.call('livechat:returnAsInquiry', this.rid, function(error/*, result*/) {
 				if (error) {
 					console.log(error);
 				} else {
@@ -222,7 +214,7 @@ Template.visitorInfo.events({
 		event.preventDefault();
 
 		instance.action.set('forward');
-	},
+	}
 });
 
 Template.visitorInfo.onCreated(function() {
@@ -253,6 +245,6 @@ Template.visitorInfo.onCreated(function() {
 	}
 
 	this.autorun(() => {
-		this.user.set(LivechatVisitor.findOne({ _id: this.visitorId.get() }));
+		this.user.set(LivechatVisitor.findOne({ '_id': this.visitorId.get() }));
 	});
 });

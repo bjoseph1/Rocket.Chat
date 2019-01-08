@@ -1,26 +1,27 @@
-import { Meteor } from 'meteor/meteor';
-import { Accounts } from 'meteor/accounts-base';
-
-Meteor.loginWithCrowd = function(...args) {
+Meteor.loginWithCrowd = function(username, password, callback) {
+	// Retrieve arguments as array
+	const args = [];
+	for (let i = 0; i < arguments.length; i++) {
+		args.push(arguments[i]);
+	}
 	// Pull username and password
-	const username = args.shift();
-	const password = args.shift();
-	const callback = args.shift();
-
+	username = args.shift();
+	password = args.shift();
 	const loginRequest = {
 		crowd: true,
 		username,
-		crowdPassword: password,
+		crowdPassword: password
 	};
 	Accounts.callLoginMethod({
 		methodArguments: [loginRequest],
 		userCallback(error) {
-			if (callback) {
-				if (error) {
-					return callback(error);
+			if (error) {
+				if (callback) {
+					callback(error);
 				}
-				return callback();
+			} else if (callback) {
+				callback();
 			}
-		},
+		}
 	});
 };

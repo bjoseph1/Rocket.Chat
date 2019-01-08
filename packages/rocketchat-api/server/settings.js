@@ -1,5 +1,3 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 RocketChat.settings.addGroup('General', function() {
 	this.section('REST API', function() {
 		this.add('API_Upper_Count_Limit', 100, { type: 'int', public: false });

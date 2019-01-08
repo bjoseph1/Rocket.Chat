@@ -1,6 +1,5 @@
-import { Meteor } from 'meteor/meteor';
-import { Random } from 'meteor/random';
-import { UploadFS } from 'meteor/jalik:ufs';
+/* globals FileUploadBase:true, UploadFS */
+/* exported FileUploadBase */
 import _ from 'underscore';
 
 UploadFS.config.defaultStorePermissions = new UploadFS.StorePermissions({
@@ -19,10 +18,6 @@ UploadFS.config.defaultStorePermissions = new UploadFS.StorePermissions({
 			return true;
 		}
 
-		if (RocketChat.authz.canAccessRoom(null, null, doc)) {
-			return true;
-		}
-
 		return false;
 	},
 	update(userId, doc) {
@@ -30,11 +25,11 @@ UploadFS.config.defaultStorePermissions = new UploadFS.StorePermissions({
 	},
 	remove(userId, doc) {
 		return RocketChat.authz.hasPermission(Meteor.userId(), 'delete-message', doc.rid) || (RocketChat.settings.get('Message_AllowDeleting') && userId === doc.userId);
-	},
+	}
 });
 
 
-export class FileUploadBase {
+FileUploadBase = class FileUploadBase {
 	constructor(store, meta, file) {
 		this.id = Random.id();
 		this.meta = meta;
@@ -55,13 +50,15 @@ export class FileUploadBase {
 			store: this.store,
 			data: this.file,
 			file: this.meta,
-			onError: (err) => callback(err),
+			onError: (err) => {
+				return callback(err);
+			},
 			onComplete: (fileData) => {
 				const file = _.pick(fileData, '_id', 'type', 'size', 'name', 'identify', 'description');
 
 				file.url = fileData.url.replace(Meteor.absoluteUrl(), '/');
 				return callback(null, file, this.store.options.name);
-			},
+			}
 		});
 
 		this.handler.onProgress = (file, progress) => {
@@ -76,4 +73,4 @@ export class FileUploadBase {
 	stop() {
 		return this.handler.stop();
 	}
-}
+};

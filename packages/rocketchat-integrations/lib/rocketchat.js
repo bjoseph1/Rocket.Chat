@@ -1,5 +1,3 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 RocketChat.integrations = {
 	outgoingEvents: {
 		sendMessage: {
@@ -8,8 +6,8 @@ RocketChat.integrations = {
 			use: {
 				channel: true,
 				triggerWords: true,
-				targetRoom: false,
-			},
+				targetRoom: false
+			}
 		},
 		fileUploaded: {
 			label: 'Integrations_Outgoing_Type_FileUploaded',
@@ -17,8 +15,8 @@ RocketChat.integrations = {
 			use: {
 				channel: true,
 				triggerWords: false,
-				targetRoom: false,
-			},
+				targetRoom: false
+			}
 		},
 		roomArchived: {
 			label: 'Integrations_Outgoing_Type_RoomArchived',
@@ -26,8 +24,8 @@ RocketChat.integrations = {
 			use: {
 				channel: false,
 				triggerWords: false,
-				targetRoom: false,
-			},
+				targetRoom: false
+			}
 		},
 		roomCreated: {
 			label: 'Integrations_Outgoing_Type_RoomCreated',
@@ -35,8 +33,8 @@ RocketChat.integrations = {
 			use: {
 				channel: false,
 				triggerWords: false,
-				targetRoom: false,
-			},
+				targetRoom: false
+			}
 		},
 		roomJoined: {
 			label: 'Integrations_Outgoing_Type_RoomJoined',
@@ -44,8 +42,8 @@ RocketChat.integrations = {
 			use: {
 				channel: true,
 				triggerWords: false,
-				targetRoom: false,
-			},
+				targetRoom: false
+			}
 		},
 		roomLeft: {
 			label: 'Integrations_Outgoing_Type_RoomLeft',
@@ -53,8 +51,8 @@ RocketChat.integrations = {
 			use: {
 				channel: true,
 				triggerWords: false,
-				targetRoom: false,
-			},
+				targetRoom: false
+			}
 		},
 		userCreated: {
 			label: 'Integrations_Outgoing_Type_UserCreated',
@@ -62,8 +60,8 @@ RocketChat.integrations = {
 			use: {
 				channel: false,
 				triggerWords: false,
-				targetRoom: true,
-			},
-		},
-	},
+				targetRoom: true
+			}
+		}
+	}
 };

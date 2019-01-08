@@ -1,12 +1,11 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
-import { AccountBox } from 'meteor/rocketchat:ui';
-
 AccountBox.addItem({
 	name: 'Livechat',
 	icon: 'livechat',
 	href: 'livechat-current-chats',
 	sideNav: 'livechatFlex',
-	condition: () => RocketChat.settings.get('Livechat_enabled') && RocketChat.authz.hasAllPermission('view-livechat-manager'),
+	condition: () => {
+		return RocketChat.settings.get('Livechat_enabled') && RocketChat.authz.hasAllPermission('view-livechat-manager');
+	}
 });
 
 RocketChat.TabBar.addButton({
@@ -15,7 +14,7 @@ RocketChat.TabBar.addButton({
 	i18nTitle: 'Visitor_Info',
 	icon: 'info-circled',
 	template: 'visitorInfo',
-	order: 0,
+	order: 0
 });
 
 RocketChat.TabBar.addButton({
@@ -24,7 +23,7 @@ RocketChat.TabBar.addButton({
 	i18nTitle: 'Past_Chats',
 	icon: 'chat',
 	template: 'visitorHistory',
-	order: 11,
+	order: 11
 });
 
 RocketChat.TabBar.addGroup('message-search', ['live']);
@@ -39,7 +38,7 @@ RocketChat.TabBar.addButton({
 	i18nTitle: 'Knowledge_Base',
 	icon: 'lightbulb',
 	template: 'externalSearch',
-	order: 10,
+	order: 10
 });
 
 RocketChat.MessageTypes.registerType({
@@ -48,7 +47,7 @@ RocketChat.MessageTypes.registerType({
 	message: 'Conversation_closed',
 	data(message) {
 		return {
-			comment: message.msg,
+			comment: message.msg
 		};
-	},
+	}
 });

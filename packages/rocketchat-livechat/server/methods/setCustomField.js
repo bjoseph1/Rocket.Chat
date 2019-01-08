@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
 import LivechatVisitors from '../models/LivechatVisitors';
 
 Meteor.methods({
@@ -15,5 +13,5 @@ Meteor.methods({
 		}
 
 		return true;
-	},
+	}
 });

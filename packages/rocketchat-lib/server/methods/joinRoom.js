@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
-
 Meteor.methods({
 	joinRoom(rid, code) {
 		check(rid, String);
@@ -24,7 +21,7 @@ Meteor.methods({
 				throw new Meteor.Error('error-not-allowed', 'Token required', { method: 'joinRoom' });
 			}
 		} else {
-			if (!RocketChat.authz.canAccessRoom(room, Meteor.user())) {
+			if ((room.t !== 'c') || (RocketChat.authz.hasPermission(Meteor.userId(), 'view-c-room') !== true)) {
 				throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'joinRoom' });
 			}
 
@@ -34,5 +31,5 @@ Meteor.methods({
 		}
 
 		return RocketChat.addUserToRoom(rid, user);
-	},
+	}
 });

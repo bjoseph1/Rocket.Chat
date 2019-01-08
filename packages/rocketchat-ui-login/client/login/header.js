@@ -1,6 +1,3 @@
-import { Template } from 'meteor/templating';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 Template.loginHeader.helpers({
 	logoUrl() {
 		const asset = RocketChat.settings.get('Assets_logo');
@@ -8,5 +5,5 @@ Template.loginHeader.helpers({
 		if (asset != null) {
 			return `${ prefix }/${ asset.url || asset.defaultUrl }`;
 		}
-	},
+	}
 });

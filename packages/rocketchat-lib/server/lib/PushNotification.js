@@ -1,5 +1,4 @@
-import { Push } from 'meteor/rocketchat:push';
-
+/* globals Push */
 class PushNotification {
 	getNotificationId(roomId) {
 		const serverId = RocketChat.settings.get('uniqueID');
@@ -25,6 +24,7 @@ class PushNotification {
 		} else {
 			title = `${ username }`;
 		}
+		const icon = RocketChat.settings.get('Assets_favicon_192').url || RocketChat.settings.get('Assets_favicon_192').defaultUrl;
 		const config = {
 			from: 'push',
 			badge,
@@ -37,17 +37,16 @@ class PushNotification {
 			gcm: {
 				style: 'inbox',
 				summaryText: '%n% new messages',
-				image: RocketChat.Assets.getURL('Assets_favicon_192'),
-			},
+				image: RocketChat.getURL(icon, { full: true })
+			}
 		};
 
 		if (category !== '') {
 			config.apn = {
-				category,
+				category
 			};
 		}
 
-		RocketChat.metrics.notificationsSent.inc({ notification_type: 'mobile' });
 		return Push.send(config);
 	}
 }

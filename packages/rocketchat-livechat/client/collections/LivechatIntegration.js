@@ -1,3 +1,1 @@
-import { Mongo } from 'meteor/mongo';
-
-export const LivechatIntegration = new Mongo.Collection('livechatIntegration');
+this.LivechatIntegration = new Mongo.Collection('livechatIntegration');

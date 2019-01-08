@@ -1,6 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat, handleError } from 'meteor/rocketchat:lib';
-// Action Links Handler. This method will be called off the client.
+//Action Links Handler. This method will be called off the client.
 
 RocketChat.actionLinks.run = (name, messageId, instance) => {
 	const message = RocketChat.actionLinks.getMessage(name, messageId);

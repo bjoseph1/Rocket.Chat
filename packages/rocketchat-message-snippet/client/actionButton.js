@@ -1,8 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat, handleError } from 'meteor/rocketchat:lib';
-import { modal } from 'meteor/rocketchat:ui';
-import { t } from 'meteor/rocketchat:utils';
-
 Meteor.startup(function() {
 	RocketChat.MessageAction.addButton({
 		id: 'snippeted-message',
@@ -11,7 +6,7 @@ Meteor.startup(function() {
 		context: [
 			'snippeted',
 			'message',
-			'message-mobile',
+			'message-mobile'
 		],
 		order: 10,
 		group: 'menu',
@@ -24,7 +19,7 @@ Meteor.startup(function() {
 				type: 'input',
 				showCancelButton: true,
 				closeOnConfirm: false,
-				inputPlaceholder: 'Snippet name',
+				inputPlaceholder: 'Snippet name'
 			}, function(filename) {
 				if (filename === false) {
 					return false;
@@ -42,7 +37,7 @@ Meteor.startup(function() {
 						title: t('Nice'),
 						text: `Snippet '${ filename }' created.`,
 						type: 'success',
-						timer: 2000,
+						timer: 2000
 					});
 				});
 			});
@@ -60,6 +55,6 @@ Meteor.startup(function() {
 			}
 
 			return RocketChat.authz.hasAtLeastOnePermission('snippet-message', message.rid);
-		},
+		}
 	});
 });

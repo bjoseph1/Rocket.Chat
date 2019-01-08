@@ -1,9 +1,8 @@
 import _ from 'underscore';
-import { Accounts } from 'meteor/accounts-base';
 
 const orig_updateOrCreateUserFromExternalService = Accounts.updateOrCreateUserFromExternalService;
 
-Accounts.updateOrCreateUserFromExternalService = function(serviceName, serviceData = {}, ...args /* , options*/) {
+Accounts.updateOrCreateUserFromExternalService = function(serviceName, serviceData = {} /*, options*/) {
 	const services = [
 		'facebook',
 		'github',
@@ -12,7 +11,7 @@ Accounts.updateOrCreateUserFromExternalService = function(serviceName, serviceDa
 		'meteor-developer',
 		'linkedin',
 		'twitter',
-		'sandstorm',
+		'sandstorm'
 	];
 
 	if (services.includes(serviceName) === false && serviceData._OAuthCustom !== true) {
@@ -21,7 +20,7 @@ Accounts.updateOrCreateUserFromExternalService = function(serviceName, serviceDa
 
 	if (serviceName === 'meteor-developer') {
 		if (Array.isArray(serviceData.emails)) {
-			const primaryEmail = serviceData.emails.sort((a) => a.primary !== true).filter((item) => item.verified === true)[0];
+			const primaryEmail = serviceData.emails.sort(a => a.primary !== true).filter(item => item.verified === true)[0];
 			serviceData.email = primaryEmail && primaryEmail.address;
 		}
 	}
@@ -35,7 +34,7 @@ Accounts.updateOrCreateUserFromExternalService = function(serviceName, serviceDa
 		if (user != null) {
 			const findQuery = {
 				address: serviceData.email,
-				verified: true,
+				verified: true
 			};
 
 			if (!_.findWhere(user.emails, findQuery)) {
@@ -47,5 +46,5 @@ Accounts.updateOrCreateUserFromExternalService = function(serviceName, serviceDa
 		}
 	}
 
-	return orig_updateOrCreateUserFromExternalService.apply(this, [serviceName, serviceData, ...args]);
+	return orig_updateOrCreateUserFromExternalService.apply(this, arguments);
 };

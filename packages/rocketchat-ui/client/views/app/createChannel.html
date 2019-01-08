@@ -14,10 +14,10 @@
 				<div class="create-channel__switches">
 					<div class="rc-switch">
 						<label class="rc-switch__label" tabindex="-1">
-							<input type="checkbox" class="rc-switch__input" name="type" value="p" checked={{roomTypeIsP}} disabled="{{cantCreateBothTypes}}">
+							<input type="checkbox" class="rc-switch__input" name="type" value="p" checked>
 							<span class="rc-switch__button">
-								<span class="rc-switch__button-inside"></span>
-							</span>
+							<span class="rc-switch__button-inside"></span>
+						</span>
 							<span class="rc-switch__text">
 								{{typeLabel}}
 							</span>
@@ -36,22 +36,6 @@
 						</label>
 						<span class="rc-switch__description">{{readOnlyDescription}}</span>
 					</div>
-					{{#if e2eEnabled}}
-						<div class="rc-switch">
-							<label class="rc-switch__label">
-								<input type="checkbox" class="rc-switch__input" name="encrypted" checked={{encrypted}} disabled="{{encryptedDisabled}}">
-								<span class="rc-switch__button">
-								<span class="rc-switch__button-inside"></span>
-							</span>
-								<span class="rc-switch__text">
-									{{_"Encrypted"}}
-								</span>
-							</label>
-							<span class="rc-switch__description">
-								{{_"Encrypted_channel_Description"}}
-							</span>
-						</div>
-					{{/if}}
 					<div class="rc-switch">
 						<label class="rc-switch__label">
 							<input type="checkbox" class="rc-switch__input" name="broadcast">

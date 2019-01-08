@@ -48,17 +48,15 @@ RocketChat.API = {
 				headers: {
 					'Content-Type': 'application/json',
 					'X-User-Id': localStorage['Meteor.userId'],
-					'X-Auth-Token': localStorage['Meteor.loginToken'],
+					'X-Auth-Token': localStorage['Meteor.loginToken']
 				},
 				data: JSON.stringify(body),
 				success: function _rlGetSuccess(result) {
 					resolve(result);
 				},
 				error: function _rlGetFailure(xhr, status, errorThrown) {
-					const error = new Error(errorThrown);
-					error.xhr = xhr;
-					reject(error);
-				},
+					reject(new Error(errorThrown));
+				}
 			});
 		});
 	},
@@ -72,10 +70,10 @@ RocketChat.API = {
 
 		return new Promise(function _jqueryFormDataPromise(resolve, reject) {
 			jQuery.ajax({
-				url: `${ window.location.origin }/api/${ endpoint }${ query }`,
+				url: `${ Meteor.absoluteUrl() }api/${ endpoint }${ query }`,
 				headers: {
 					'X-User-Id': localStorage['Meteor.userId'],
-					'X-Auth-Token': localStorage['Meteor.loginToken'],
+					'X-Auth-Token': localStorage['Meteor.loginToken']
 				},
 				data: formData,
 				processData: false,
@@ -86,7 +84,7 @@ RocketChat.API = {
 				},
 				error: function _jqueryFormDataError(xhr, status, errorThrown) {
 					reject(new Error(errorThrown));
-				},
+				}
 			});
 		});
 	},
@@ -106,6 +104,6 @@ RocketChat.API = {
 
 		upload(endpoint, params, formData) {
 			return RocketChat.API.upload(`v1/${ endpoint }`, params, formData);
-		},
-	},
+		}
+	}
 };

@@ -1,4 +1,3 @@
-import { TAPi18next } from 'meteor/tap:i18n';
 import _ from 'underscore';
 import s from 'underscore.string';
 

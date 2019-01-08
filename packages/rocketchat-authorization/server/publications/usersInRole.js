@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 Meteor.publish('usersInRole', function(roleName, scope, limit = 50) {
 	if (!this.userId) {
 		return this.ready();
@@ -8,15 +5,15 @@ Meteor.publish('usersInRole', function(roleName, scope, limit = 50) {
 
 	if (!RocketChat.authz.hasPermission(this.userId, 'access-permissions')) {
 		return this.error(new Meteor.Error('error-not-allowed', 'Not allowed', {
-			publish: 'usersInRole',
+			publish: 'usersInRole'
 		}));
 	}
 
 	const options = {
 		limit,
 		sort: {
-			name: 1,
-		},
+			name: 1
+		}
 	};
 
 	return RocketChat.authz.getUsersInRole(roleName, scope, options);

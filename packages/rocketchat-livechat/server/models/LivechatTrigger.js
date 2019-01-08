@@ -1,5 +1,3 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 /**
  * Livechat Trigger model
  */

@@ -1,8 +1,5 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 Meteor.methods({
-	'livechat:pageVisited'(token, room, pageInfo) {
-		RocketChat.Livechat.savePageHistory(token, room, pageInfo);
-	},
+	'livechat:pageVisited'(token, pageInfo) {
+		return RocketChat.Livechat.savePageHistory(token, pageInfo);
+	}
 });

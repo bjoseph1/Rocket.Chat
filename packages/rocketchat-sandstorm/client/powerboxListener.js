@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 RocketChat.Sandstorm = RocketChat.Sandstorm || {};
 
 RocketChat.Sandstorm.request = function() {};
@@ -17,7 +14,7 @@ if (Meteor.settings.public.sandstorm) {
 	window.addEventListener('message', messageListener);
 
 	const interfaces = {
-		uiView: 'EAZQAQEAABEBF1EEAQH_5-Jn6pjXtNsAAAA',
+		uiView: 'EAZQAQEAABEBF1EEAQH_5-Jn6pjXtNsAAAA'
 	};
 
 	RocketChat.Sandstorm.request = function(interfaceName, cb) {
@@ -25,7 +22,7 @@ if (Meteor.settings.public.sandstorm) {
 		callbackMap[rpcId] = cb;
 		window.parent.postMessage({ powerboxRequest: {
 			rpcId,
-			query: [interfaces[interfaceName]],
-		} }, '*');
+			query: [interfaces[interfaceName]]
+		}}, '*');
 	};
 }

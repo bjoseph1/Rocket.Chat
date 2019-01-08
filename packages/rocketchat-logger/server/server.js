@@ -1,14 +1,9 @@
-import { Meteor } from 'meteor/meteor';
-import { Random } from 'meteor/random';
-import { EJSON } from 'meteor/ejson';
-import { Log } from 'meteor/logging';
-import { EventEmitter } from 'events';
+/* globals EventEmitter LoggerManager SystemLogger Log*/
 import _ from 'underscore';
 import s from 'underscore.string';
 
-let Logger;
-
-const LoggerManager = new class extends EventEmitter {
+//TODO: change this global to import
+LoggerManager = new class extends EventEmitter { // eslint-disable-line no-undef
 	constructor() {
 		super();
 		this.enabled = false;
@@ -27,7 +22,7 @@ const LoggerManager = new class extends EventEmitter {
 	}
 	addToQueue(logger, args) {
 		this.queue.push({
-			logger, args,
+			logger, args
 		});
 	}
 	dispatchQueue() {
@@ -48,37 +43,39 @@ const LoggerManager = new class extends EventEmitter {
 	}
 };
 
+
+
 const defaultTypes = {
 	debug: {
 		name: 'debug',
 		color: 'blue',
-		level: 2,
+		level: 2
 	},
 	log: {
 		name: 'info',
 		color: 'blue',
-		level: 1,
+		level: 1
 	},
 	info: {
 		name: 'info',
 		color: 'blue',
-		level: 1,
+		level: 1
 	},
 	success: {
 		name: 'info',
 		color: 'green',
-		level: 1,
+		level: 1
 	},
 	warn: {
 		name: 'warn',
 		color: 'magenta',
-		level: 1,
+		level: 1
 	},
 	error: {
 		name: 'error',
 		color: 'red',
-		level: 0,
-	},
+		level: 0
+	}
 };
 
 class _Logger {
@@ -98,7 +95,7 @@ class _Logger {
 					type,
 					level: typeConfig.level,
 					method: typeConfig.name,
-					arguments: args,
+					'arguments': args
 				});
 			};
 
@@ -109,7 +106,7 @@ class _Logger {
 					box: true,
 					level: typeConfig.level,
 					method: typeConfig.name,
-					arguments: args,
+					'arguments': args
 				});
 			};
 		});
@@ -127,7 +124,7 @@ class _Logger {
 						type: typeConfig.type,
 						level: typeConfig.level != null ? typeConfig.level : defaultTypes[typeConfig.type] && defaultTypes[typeConfig.type].level,
 						method,
-						arguments: args,
+						'arguments': args
 					});
 				};
 				this[`${ method }_box`] = function(...args) {
@@ -137,7 +134,7 @@ class _Logger {
 						box: true,
 						level: typeConfig.level != null ? typeConfig.level : defaultTypes[typeConfig.type] && defaultTypes[typeConfig.type].level,
 						method,
-						arguments: args,
+						'arguments': args
 					});
 				};
 			});
@@ -146,12 +143,12 @@ class _Logger {
 			_.each(this.config.sections, (name, section) => {
 				this[section] = {};
 				_.each(defaultTypes, (typeConfig, type) => {
-					self[section][type] = (...args) => this[type].apply({ __section: name }, args);
-					self[section][`${ type }_box`] = (...args) => this[`${ type }_box`].apply({ __section: name }, args);
+					self[section][type] = (...args) => this[type].apply({__section: name}, args);
+					self[section][`${ type }_box`] = (...args) => this[`${ type }_box`].apply({__section: name}, args);
 				});
 				_.each(this.config.methods, (typeConfig, method) => {
-					self[section][method] = (...args) => self[method].apply({ __section: name }, args);
-					self[section][`${ method }_box`] = (...args) => self[`${ method }_box`].apply({ __section: name }, args);
+					self[section][method] = (...args) => self[method].apply({__section: name}, args);
+					self[section][`${ method }_box`] = (...args) => self[`${ method }_box`].apply({__section: name}, args);
 				});
 			});
 		}
@@ -165,8 +162,8 @@ class _Logger {
 		}
 		const details = this._getCallerDetails();
 		const detailParts = [];
-		if (details.package && (LoggerManager.showPackage === true || options.type === 'error')) {
-			detailParts.push(details.package);
+		if (details['package'] && (LoggerManager.showPackage === true || options.type === 'error')) {
+			detailParts.push(details['package']);
 		}
 		if (LoggerManager.showFileAndLine === true || options.type === 'error') {
 			if ((details.file != null) && (details.line != null)) {
@@ -194,7 +191,7 @@ class _Logger {
 			// We do NOT use Error.prepareStackTrace here (a V8 extension that gets us a
 			// core-parsed stack) since it's impossible to compose it with the use of
 			// Error.prepareStackTrace used on the server for source maps.
-			const { stack } = new Error();
+			const {stack} = new Error();
 			return stack;
 		};
 		const stack = getStack();
@@ -207,7 +204,7 @@ class _Logger {
 		let line = lines[0];
 		for (let index = 0, len = lines.length; index < len, index++; line = lines[index]) {
 			if (line.match(/^\s*at eval \(eval/)) {
-				return { file: 'eval' };
+				return {file: 'eval'};
 			}
 
 			if (!line.match(/packages\/rocketchat_logger(?:\/|\.js)/)) {
@@ -230,7 +227,7 @@ class _Logger {
 		details.file = match[1].split('/').slice(-1)[0].split('?')[0];
 		const packageMatch = match[1].match(/packages\/([^\.\/]+)(?:\/|\.)/);
 		if (packageMatch) {
-			details.package = packageMatch[1];
+			details['package'] = packageMatch[1];
 		}
 		return details;
 	}
@@ -240,7 +237,7 @@ class _Logger {
 		}
 		let len = 0;
 
-		len = Math.max.apply(null, message.map((line) => line.length));
+		len = Math.max.apply(null, message.map(line => line.length));
 
 		const topLine = `+--${ s.pad('', len, '-') }--+`;
 		const separator = `|  ${ s.pad('', len, '') }  |`;
@@ -253,16 +250,16 @@ class _Logger {
 		}
 		lines.push(separator);
 
-		lines = [...lines, ...message.map((line) => `|  ${ s.rpad(line, len) }  |`)];
+		lines = [...lines, ...message.map(line => `|  ${ s.rpad(line, len) }  |`)];
 
 		lines.push(separator);
 		lines.push(topLine);
 		return lines;
 	}
 
-	_log(options, ...args) {
+	_log(options) {
 		if (LoggerManager.enabled === false) {
-			LoggerManager.addToQueue(this, [options, ...args]);
+			LoggerManager.addToQueue(this, arguments);
 			return;
 		}
 		if (options.level == null) {
@@ -288,8 +285,8 @@ class _Logger {
 			}
 
 			console.log(subPrefix, prefix);
-			box.forEach((line) => {
-				console.log(subPrefix, color ? line[color] : line);
+			box.forEach(line => {
+				console.log(subPrefix, color ? line[color]: line);
 			});
 
 		} else {
@@ -298,8 +295,8 @@ class _Logger {
 		}
 	}
 }
-
-Logger = _Logger;
+// TODO: change this global to import
+Logger = global.Logger = _Logger;
 const processString = function(string, date) {
 	let obj;
 	try {
@@ -309,29 +306,29 @@ const processString = function(string, date) {
 			obj = {
 				message: string,
 				time: date,
-				level: 'info',
+				level: 'info'
 			};
 		}
-		return Log.format(obj, { color: true });
+		return Log.format(obj, {color: true});
 	} catch (error) {
 		return string;
 	}
 };
-
-const SystemLogger = new Logger('System', {
+// TODO: change this global to import
+SystemLogger = new Logger('System', { // eslint-disable-line no-undef
 	methods: {
 		startup: {
 			type: 'success',
-			level: 0,
-		},
-	},
+			level: 0
+		}
+	}
 });
 
 
 const StdOut = new class extends EventEmitter {
 	constructor() {
 		super();
-		const { write } = process.stdout;
+		const write = process.stdout.write;
 		this.queue = [];
 		process.stdout.write = (...args) => {
 			write.apply(process.stdout, args);
@@ -340,7 +337,7 @@ const StdOut = new class extends EventEmitter {
 			const item = {
 				id: Random.id(),
 				string,
-				ts: date,
+				ts: date
 			};
 			this.queue.push(item);
 
@@ -361,10 +358,10 @@ Meteor.publish('stdout', function() {
 		return this.ready();
 	}
 
-	StdOut.queue.forEach((item) => {
+	StdOut.queue.forEach(item => {
 		this.added('stdout', item.id, {
 			string: item.string,
-			ts: item.ts,
+			ts: item.ts
 		});
 	});
 
@@ -372,7 +369,7 @@ Meteor.publish('stdout', function() {
 	StdOut.on('write', (string, item) => {
 		this.added('stdout', item.id, {
 			string: item.string,
-			ts: item.ts,
+			ts: item.ts
 		});
 	});
 });

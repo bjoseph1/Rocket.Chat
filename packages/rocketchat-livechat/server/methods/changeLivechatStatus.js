@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 Meteor.methods({
 	'livechat:changeLivechatStatus'() {
 		if (!Meteor.userId()) {
@@ -12,5 +9,5 @@ Meteor.methods({
 		const newStatus = user.statusLivechat === 'available' ? 'not-available' : 'available';
 
 		return RocketChat.models.Users.setLivechatStatus(user._id, newStatus);
-	},
+	}
 });

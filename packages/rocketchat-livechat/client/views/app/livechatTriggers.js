@@ -1,19 +1,11 @@
-import { Meteor } from 'meteor/meteor';
-import { FlowRouter } from 'meteor/kadira:flow-router';
-import { Template } from 'meteor/templating';
-import { modal } from 'meteor/rocketchat:ui';
-import { t } from 'meteor/rocketchat:utils';
-import { handleError } from 'meteor/rocketchat:lib';
-import { LivechatTrigger } from '../../collections/LivechatTrigger';
-
 Template.livechatTriggers.helpers({
 	triggers() {
 		return LivechatTrigger.find();
-	},
+	}
 });
 
 Template.livechatTriggers.events({
-	'click .remove-trigger'(e/* , instance*/) {
+	'click .remove-trigger'(e/*, instance*/) {
 		e.preventDefault();
 		e.stopPropagation();
 
@@ -25,9 +17,9 @@ Template.livechatTriggers.events({
 			confirmButtonText: t('Yes'),
 			cancelButtonText: t('Cancel'),
 			closeOnConfirm: false,
-			html: false,
+			html: false
 		}, () => {
-			Meteor.call('livechat:removeTrigger', this._id, function(error/* , result*/) {
+			Meteor.call('livechat:removeTrigger', this._id, function(error/*, result*/) {
 				if (error) {
 					return handleError(error);
 				}
@@ -36,18 +28,18 @@ Template.livechatTriggers.events({
 					text: t('Trigger_removed'),
 					type: 'success',
 					timer: 1000,
-					showConfirmButton: false,
+					showConfirmButton: false
 				});
 			});
 		});
 	},
 
-	'click .trigger-info'(e/* , instance*/) {
+	'click .trigger-info'(e/*, instance*/) {
 		e.preventDefault();
 		FlowRouter.go('livechat-trigger-edit', { _id: this._id });
 	},
 
-	'click .delete-trigger'(e/* , instance*/) {
+	'click .delete-trigger'(e/*, instance*/) {
 		e.preventDefault();
 
 		modal.open({
@@ -58,9 +50,9 @@ Template.livechatTriggers.events({
 			confirmButtonText: t('Yes'),
 			cancelButtonText: t('Cancel'),
 			closeOnConfirm: false,
-			html: false,
+			html: false
 		}, () => {
-			Meteor.call('livechat:removeTrigger', this._id, function(error/* , result*/) {
+			Meteor.call('livechat:removeTrigger', this._id, function(error/*, result*/) {
 				if (error) {
 					return handleError(error);
 				}
@@ -70,11 +62,11 @@ Template.livechatTriggers.events({
 					text: t('Trigger_removed'),
 					type: 'success',
 					timer: 1000,
-					showConfirmButton: false,
+					showConfirmButton: false
 				});
 			});
 		});
-	},
+	}
 });
 
 Template.livechatTriggers.onCreated(function() {

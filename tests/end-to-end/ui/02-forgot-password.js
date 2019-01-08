@@ -1,3 +1,5 @@
+/* eslint-env mocha */
+
 import loginPage from '../../pageobjects/login.page';
 
 describe('[Forgot Password]', () => {

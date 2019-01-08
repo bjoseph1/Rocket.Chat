@@ -2,15 +2,17 @@ Package.describe({
 	name: 'rocketchat:slashcommands-msg',
 	version: '0.0.1',
 	summary: 'Command handler for the /msg command',
-	git: '',
+	git: ''
 });
 
 Package.onUse(function(api) {
 	api.use([
 		'ecmascript',
 		'check',
-		'rocketchat:lib',
-		'templating',
+		'rocketchat:lib'
 	]);
-	api.mainModule('server/index.js', 'server');
+
+	api.use('templating', 'client');
+
+	api.addFiles('server.js', 'server');
 });

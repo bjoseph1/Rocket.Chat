@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
-
 Meteor.methods({
 	getRoomJoinCode(rid) {
 		check(rid, String);
@@ -13,8 +10,8 @@ Meteor.methods({
 			throw new Meteor.Error('error-not-authorized', 'Not authorized', { method: 'getJoinCode' });
 		}
 
-		const [room] = RocketChat.models.Rooms.findById(rid).fetch();
+		const [ room ] = RocketChat.models.Rooms.findById(rid).fetch();
 
 		return room && room.joinCode;
-	},
+	}
 });

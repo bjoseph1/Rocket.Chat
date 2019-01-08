@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { Match, check } from 'meteor/check';
-
 Meteor.methods({
 	createPrivateGroup(name, members, readOnly = false, customFields = {}, extraData = {}) {
 		check(name, String);
@@ -20,11 +17,11 @@ Meteor.methods({
 				require: String,
 				tokens: [{
 					token: String,
-					balance: String,
-				}],
-			}),
+					balance: String
+				}]
+			})
 		}));
 
-		return RocketChat.createRoom('p', name, Meteor.user() && Meteor.user().username, members, readOnly, { customFields, ...extraData });
-	},
+		return RocketChat.createRoom('p', name, Meteor.user() && Meteor.user().username, members, readOnly, {customFields, ...extraData});
+	}
 });

@@ -1,6 +1,4 @@
-import { ReactiveVar } from 'meteor/reactive-var';
-
-VideoRecorder = new (class VideoRecorder {
+this.VideoRecorder = new class {
 	constructor() {
 		this.started = false;
 		this.cameraStarted = new ReactiveVar(false);
@@ -9,31 +7,20 @@ VideoRecorder = new (class VideoRecorder {
 	}
 
 	start(videoel, cb) {
+		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+		window.URL = window.URL || window.webkitURL;
+
 		this.videoel = videoel;
-
-		const handleSuccess = (stream) => {
+		const ok = stream => {
 			this.startUserMedia(stream);
-			cb && cb.call(this, true);
+			return (cb != null ? cb.call(this) : undefined);
 		};
 
-		const handleError = (error) => {
-			console.error(error);
-			cb && cb.call(this, false);
-		};
-
-		const oldGetUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
-			navigator.msGetUserMedia;
-
-		if (navigator.mediaDevices) {
-			navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-				.then(handleSuccess, handleError);
-			return;
-		} else if (oldGetUserMedia) {
-			oldGetUserMedia.call(navigator, { audio: true, video: true }, handleSuccess, handleError);
-			return;
+		if (navigator.getUserMedia == null) {
+			return cb(false);
 		}
 
-		cb && cb.call(this, false);
+		return navigator.getUserMedia({audio: true, video: true}, ok, e => console.log(`No live video input: ${ e }`));
 	}
 
 	record() {
@@ -41,8 +28,10 @@ VideoRecorder = new (class VideoRecorder {
 		if (this.stream == null) {
 			return;
 		}
-		this.mediaRecorder = new MediaRecorder(this.stream, { type: 'video/webm' });
-		this.mediaRecorder.ondataavailable = (blobev) => {
+		this.mediaRecorder = new MediaRecorder(this.stream);
+		this.mediaRecorder.stream = this.stream;
+		this.mediaRecorder.mimeType = 'video/webm';
+		this.mediaRecorder.ondataavailable = blobev => {
 			this.chunks.push(blobev.data);
 			if (!this.recordingAvailable.get()) {
 				return this.recordingAvailable.set(true);
@@ -54,16 +43,9 @@ VideoRecorder = new (class VideoRecorder {
 
 	startUserMedia(stream) {
 		this.stream = stream;
-
-		try {
-			this.videoel.srcObject = stream;
-		} catch (error) {
-			const URL = window.URL || window.webkitURL;
-			this.videoel.src = URL.createObjectURL(stream);
-		}
-
+		this.videoel.src = URL.createObjectURL(stream);
 		this.videoel.onloadedmetadata = () => {
-			this.videoel && this.videoel.play();
+			return this.videoel.play();
 		};
 
 		this.started = true;
@@ -71,50 +53,46 @@ VideoRecorder = new (class VideoRecorder {
 	}
 
 	stop(cb) {
-		if (!this.started) {
-			return;
-		}
+		if (this.started) {
+			this.stopRecording();
 
-		this.stopRecording();
+			if (this.stream) {
+				const vtracks = this.stream.getVideoTracks();
+				for (const vtrack of Array.from(vtracks)) {
+					vtrack.stop();
+				}
 
-		if (this.stream) {
-			const vtracks = this.stream.getVideoTracks();
-			for (const vtrack of Array.from(vtracks)) {
-				vtrack.stop();
+				const atracks = this.stream.getAudioTracks();
+				for (const atrack of Array.from(atracks)) {
+					atrack.stop();
+				}
 			}
 
-			const atracks = this.stream.getAudioTracks();
-			for (const atrack of Array.from(atracks)) {
-				atrack.stop();
+			if (this.videoel) {
+				this.videoel.pause;
+				this.videoel.src = '';
 			}
+
+			this.started = false;
+			this.cameraStarted.set(false);
+			this.recordingAvailable.set(false);
+
+			if (cb && this.chunks) {
+				const blob = new Blob(this.chunks, { 'type' :  'video/webm' });
+				cb(blob);
+			}
+
+			delete this.recorder;
+			delete this.stream;
+			return delete this.videoel;
 		}
-
-		if (this.videoel) {
-			this.videoel.pause;
-			this.videoel.src = '';
-		}
-
-		this.started = false;
-		this.cameraStarted.set(false);
-		this.recordingAvailable.set(false);
-
-		if (cb && this.chunks) {
-			const blob = new Blob(this.chunks, { type: 'video/webm' });
-			cb(blob);
-		}
-
-		delete this.recorder;
-		delete this.stream;
-		delete this.videoel;
 	}
 
 	stopRecording() {
-		if (!this.started || !this.recording || !this.mediaRecorder) {
-			return;
+		if (this.started && this.recording && this.mediaRecorder) {
+			this.mediaRecorder.stop();
+			this.recording.set(false);
+			return delete this.mediaRecorder;
 		}
-
-		this.mediaRecorder.stop();
-		this.recording.set(false);
-		delete this.mediaRecorder;
 	}
-});
+};

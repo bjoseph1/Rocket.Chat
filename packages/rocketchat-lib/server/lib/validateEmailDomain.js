@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 import _ from 'underscore';
 import dns from 'dns';
 

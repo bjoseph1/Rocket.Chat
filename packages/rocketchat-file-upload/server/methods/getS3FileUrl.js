@@ -1,5 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { UploadFS } from 'meteor/jalik:ufs';
+/* globals UploadFS */
 
 let protectedFiles;
 
@@ -15,5 +14,5 @@ Meteor.methods({
 		const file = RocketChat.models.Uploads.findOneById(fileId);
 
 		return UploadFS.getStore('AmazonS3:Uploads').getRedirectURL(file);
-	},
+	}
 });

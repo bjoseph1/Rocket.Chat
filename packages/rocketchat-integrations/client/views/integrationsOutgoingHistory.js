@@ -1,10 +1,5 @@
-import { Meteor } from 'meteor/meteor';
-import { ReactiveVar } from 'meteor/reactive-var';
-import { FlowRouter } from 'meteor/kadira:flow-router';
-import { Template } from 'meteor/templating';
-import { TAPi18n } from 'meteor/tap:i18n';
-import { RocketChat, handleError } from 'meteor/rocketchat:lib';
-import { ChatIntegrations, ChatIntegrationHistory } from '../collections';
+/* global ChatIntegrations, ChatIntegrationHistory */
+
 import _ from 'underscore';
 import hljs from 'highlight.js';
 import moment from 'moment';
@@ -111,7 +106,7 @@ Template.integrationsOutgoingHistory.helpers({
 
 	integrationId() {
 		return this.params && this.params() && this.params().id;
-	},
+	}
 });
 
 Template.integrationsOutgoingHistory.events({
@@ -160,5 +155,5 @@ Template.integrationsOutgoingHistory.events({
 		if (e.target.scrollTop >= e.target.scrollHeight - e.target.clientHeight) {
 			instance.limit.set(instance.limit.get() + 25);
 		}
-	}, 200),
+	}, 200)
 });

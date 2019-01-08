@@ -1,5 +1,3 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 RocketChat.slashCommands.add('kick', function(command, params) {
 	const username = params.trim();
 	if (username === '') {
@@ -8,5 +6,5 @@ RocketChat.slashCommands.add('kick', function(command, params) {
 	return username.replace('@', '');
 }, {
 	description: 'Remove_someone_from_room',
-	params: '@username',
+	params: '@username'
 });

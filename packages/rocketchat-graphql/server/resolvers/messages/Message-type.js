@@ -14,7 +14,9 @@ const resolver = {
 
 			return user || root.u;
 		},
-		channel: (root) => RocketChat.models.Rooms.findOne(root.rid),
+		channel: (root) => {
+			return RocketChat.models.Rooms.findOne(root.rid);
+		},
 		fromServer: (root) => typeof root.t !== 'undefined', // on a message sent by user `true` otherwise `false`
 		type: property('t'),
 		channelRef: (root) => {
@@ -24,12 +26,12 @@ const resolver = {
 
 			return RocketChat.models.Rooms.find({
 				_id: {
-					$in: root.channels.map((c) => c._id),
-				},
+					$in: root.channels.map(c => c._id)
+				}
 			}, {
 				sort: {
-					name: 1,
-				},
+					name: 1
+				}
 			}).fetch();
 		},
 		userRef: (root) => {
@@ -39,12 +41,12 @@ const resolver = {
 
 			return RocketChat.models.Users.find({
 				_id: {
-					$in: root.mentions.map((c) => c._id),
-				},
+					$in: root.mentions.map(c => c._id)
+				}
 			}, {
 				sort: {
-					username: 1,
-				},
+					username: 1
+				}
 			}).fetch();
 		},
 		reactions: (root) => {
@@ -54,21 +56,21 @@ const resolver = {
 
 			const reactions = [];
 
-			Object.keys(root.reactions).forEach((icon) => {
-				root.reactions[icon].usernames.forEach((username) => {
+			Object.keys(root.reactions).forEach(icon => {
+				root.reactions[icon].usernames.forEach(username => {
 					reactions.push({
 						icon,
-						username,
+						username
 					});
 				});
 			});
 
 			return reactions;
-		},
-	},
+		}
+	}
 };
 
 export {
 	schema,
-	resolver,
+	resolver
 };

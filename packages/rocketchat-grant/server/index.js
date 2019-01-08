@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 import { WebApp } from 'meteor/webapp';
 import session from 'express-session';
 import Grant from 'grant-express';
@@ -16,7 +15,7 @@ let grant;
 WebApp.connectHandlers.use(session({
 	secret: 'grant',
 	resave: true,
-	saveUninitialized: true,
+	saveUninitialized: true
 }));
 
 // grant
@@ -54,5 +53,5 @@ export {
 	generateAppCallback,
 	Providers,
 	Settings,
-	GrantError,
+	GrantError
 };

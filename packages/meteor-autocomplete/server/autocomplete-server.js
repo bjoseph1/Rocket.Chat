@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { Mongo } from 'meteor/mongo';
 // This also attaches an onStop callback to sub, so we don't need to worry about that.
 // https://github.com/meteor/meteor/blob/devel/packages/mongo/collection.js
 const Autocomplete = class {

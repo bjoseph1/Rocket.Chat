@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 Meteor.startup(function() {
 	RocketChat.ChannelSettings.addOption({
 		group: ['room'],
@@ -14,6 +11,6 @@ Meteor.startup(function() {
 			}
 
 			return false;
-		},
+		}
 	});
 });

@@ -1,22 +1,12 @@
-import { Meteor } from 'meteor/meteor';
-import { Blaze } from 'meteor/blaze';
-import { FlowRouter } from 'meteor/kadira:flow-router';
-import { Template } from 'meteor/templating';
-import { TAPi18n } from 'meteor/tap:i18n';
-import { isRtl } from 'meteor/rocketchat:utils';
+/* globals popover isRtl */
 import _ from 'underscore';
 
 import { hide, leave } from 'meteor/rocketchat:lib';
 
-popover = {
+this.popover = {
 	renderedPopover: null,
-	open({ currentTarget, ...config }) {
-		// Popover position must be computed as soon as possible, avoiding DOM changes over currentTarget
-		const data = {
-			targetRect: currentTarget && currentTarget.getBoundingClientRect && currentTarget.getBoundingClientRect(),
-			...config,
-		};
-		this.renderedPopover = Blaze.renderWithData(Template.popover, data, document.body);
+	open(config) {
+		this.renderedPopover = Blaze.renderWithData(Template.popover, config, document.body);
 	},
 	close() {
 		if (!this.renderedPopover) {
@@ -25,17 +15,17 @@ popover = {
 
 		Blaze.remove(this.renderedPopover);
 
-		const { activeElement } = this.renderedPopover.dataVar.curValue;
+		const activeElement = this.renderedPopover.dataVar.curValue.activeElement;
 		if (activeElement) {
 			$(activeElement).removeClass('active');
 		}
-	},
+	}
 };
 
 Template.popover.helpers({
 	hasAction() {
 		return !!this.action;
-	},
+	}
 });
 
 Template.popover.onRendered(function() {
@@ -49,23 +39,21 @@ Template.popover.onRendered(function() {
 		}
 	});
 	const { offsetVertical = 0, offsetHorizontal = 0 } = this.data;
-	const { activeElement } = this.data;
+	const activeElement = this.data.activeElement;
 	const popoverContent = this.firstNode.children[0];
 	const position = _.throttle(() => {
 
 		const direction = typeof this.data.direction === 'function' ? this.data.direction() : this.data.direction;
 
 		const verticalDirection = /top/.test(direction) ? 'top' : 'bottom';
-		const rtlDirection = isRtl() ^ /inverted/.test(direction) ? 'left' : 'right';
-		const rightDirection = /right/.test(direction) ? 'right' : rtlDirection;
-		const horizontalDirection = /left/.test(direction) ? 'left' : rightDirection;
+		const horizontalDirection = /left/.test(direction) ? 'left' : /right/.test(direction) ? 'right' : isRtl() ^ /inverted/.test(direction) ? 'left' : 'right';
 
 		const position = typeof this.data.position === 'function' ? this.data.position() : this.data.position;
 		const customCSSProperties = typeof this.data.customCSSProperties === 'function' ? this.data.customCSSProperties() : this.data.customCSSProperties;
 
 		const mousePosition = typeof this.data.mousePosition === 'function' ? this.data.mousePosition() : this.data.mousePosition || {
-			x: this.data.targetRect[horizontalDirection === 'left' ? 'right' : 'left'],
-			y: this.data.targetRect[verticalDirection],
+			x: this.data.currentTarget.getBoundingClientRect()[horizontalDirection === 'left'? 'right' : 'left'],
+			y: this.data.currentTarget.getBoundingClientRect()[verticalDirection]
 		};
 		const offsetWidth = offsetHorizontal * (horizontalDirection === 'left' ? 1 : -1);
 		const offsetHeight = offsetVertical * (verticalDirection === 'bottom' ? 1 : -1);
@@ -74,7 +62,7 @@ Template.popover.onRendered(function() {
 			popoverContent.style.top = `${ position.top }px`;
 			popoverContent.style.left = `${ position.left }px`;
 		} else {
-			const clientHeight = this.data.targetRect.height;
+			const clientHeight = this.data.currentTarget.clientHeight;
 			const popoverWidth = popoverContent.offsetWidth;
 			const popoverHeight = popoverContent.offsetHeight;
 			const windowWidth = window.innerWidth;
@@ -134,8 +122,6 @@ Template.popover.onRendered(function() {
 	$(window).on('resize', position);
 	position();
 	this.position = position;
-
-	this.firstNode.style.visibility = 'visible';
 });
 
 Template.popover.onDestroyed(function() {
@@ -154,7 +140,7 @@ Template.popover.events({
 		popover.close();
 	},
 	'click [data-type="messagebox-action"]'(event, t) {
-		const { id } = event.currentTarget.dataset;
+		const id = event.currentTarget.dataset.id;
 		const action = RocketChat.messageBox.actions.getById(id);
 		if ((action[0] != null ? action[0].action : undefined) != null) {
 			action[0].action({ rid: t.data.data.rid, messageBox: document.querySelector('.rc-message-box'), element: event.currentTarget, event });
@@ -183,7 +169,7 @@ Template.popover.events({
 				confirmButtonText: TAPi18n.__('Report_exclamation_mark'),
 				cancelButtonText: TAPi18n.__('Cancel'),
 				closeOnConfirm: false,
-				html: false,
+				html: false
 			}, (inputValue) => {
 				if (inputValue === false) {
 					return false;
@@ -201,7 +187,7 @@ Template.popover.events({
 					text: TAPi18n.__('Thank_you_exclamation_mark '),
 					type: 'success',
 					timer: 1000,
-					showConfirmButton: false,
+					showConfirmButton: false
 				});
 			});
 			popover.close();
@@ -253,9 +239,9 @@ Template.popover.events({
 
 			return false;
 		}
-	},
+	}
 });
 
 Template.popover.helpers({
-	isSafariIos: /iP(ad|hone|od).+Version\/[\d\.]+.*Safari/i.test(navigator.userAgent),
+	isSafariIos: /iP(ad|hone|od).+Version\/[\d\.]+.*Safari/i.test(navigator.userAgent)
 });

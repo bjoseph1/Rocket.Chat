@@ -1,21 +1,18 @@
-import { Meteor } from 'meteor/meteor';
-import { Template } from 'meteor/templating';
-import { ServiceConfiguration } from 'meteor/service-configuration';
-import { CustomOAuth } from 'meteor/rocketchat:custom-oauth';
+/* globals CustomOAuth */
 import s from 'underscore.string';
 import toastr from 'toastr';
 
 Meteor.startup(function() {
 	return ServiceConfiguration.configurations.find({
-		custom: true,
+		custom: true
 	}).observe({
 		added(record) {
 			return new CustomOAuth(record.service, {
 				serverURL: record.serverURL,
 				authorizePath: record.authorizePath,
-				scope: record.scope,
+				scope: record.scope
 			});
-		},
+		}
 	});
 });
 
@@ -24,8 +21,8 @@ Template.loginServices.helpers({
 		const services = [];
 		const authServices = ServiceConfiguration.configurations.find({}, {
 			sort: {
-				service: 1,
-			},
+				service: 1
+			}
 		}).fetch();
 		authServices.forEach(function(service) {
 			let icon;
@@ -54,16 +51,16 @@ Template.loginServices.helpers({
 			return services.push({
 				service,
 				displayName: serviceName,
-				icon,
+				icon
 			});
 		});
 		return services;
-	},
+	}
 });
 
 const longinMethods = {
 	'meteor-developer': 'MeteorDeveloperAccount',
-	linkedin: 'LinkedIn',
+	'linkedin': 'LinkedIn'
 };
 
 Template.loginServices.events({
@@ -104,5 +101,5 @@ Template.loginServices.events({
 				}
 			});
 		}
-	},
+	}
 });

@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
-import { RocketChat } from 'meteor/rocketchat:lib';
 import _ from 'underscore';
 
 RocketChat.AutoTranslate = {
@@ -12,7 +9,7 @@ RocketChat.AutoTranslate = {
 		if (rid) {
 			subscription = RocketChat.models.Subscriptions.findOne({ rid }, { fields: { autoTranslateLanguage: 1 } });
 		}
-		const language = (subscription && subscription.autoTranslateLanguage) || Meteor.user().language || window.defaultUserLanguage();
+		const language = subscription && subscription.autoTranslateLanguage || Meteor.user().language || window.defaultUserLanguage();
 		if (language.indexOf('-') !== -1) {
 			if (!_.findWhere(this.supportedLanguages, { language })) {
 				return language.substr(0, 2);
@@ -55,7 +52,7 @@ RocketChat.AutoTranslate = {
 							message.translations = {};
 						}
 						if (subscription && subscription.autoTranslate !== message.autoTranslateShowInverse) {
-							message.translations.original = message.html;
+							message.translations['original'] = message.html;
 							if (message.translations[autoTranslateLanguage]) {
 								message.html = message.translations[autoTranslateLanguage];
 							}
@@ -89,11 +86,9 @@ RocketChat.AutoTranslate = {
 				RocketChat.callbacks.remove('streamMessage', 'autotranslate-stream');
 			}
 		});
-	},
+	}
 };
 
 Meteor.startup(function() {
-	RocketChat.CachedCollectionManager.onLogin(() => {
-		RocketChat.AutoTranslate.init();
-	});
+	RocketChat.AutoTranslate.init();
 });

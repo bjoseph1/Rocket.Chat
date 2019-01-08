@@ -1,23 +1,42 @@
-import { check } from 'meteor/check';
 import ModelsBaseDb from './_BaseDb';
-import objectPath from 'object-path';
-import _ from 'underscore';
+import ModelsBaseCache from './_BaseCache';
+
+RocketChat.models._CacheControl = new Meteor.EnvironmentVariable();
 
 class ModelsBase {
-	constructor(nameOrModel) {
+	constructor(nameOrModel, useCache) {
 		this._db = new ModelsBaseDb(nameOrModel, this);
 		this.model = this._db.model;
 		this.collectionName = this._db.collectionName;
 		this.name = this._db.name;
 
-		this.on = this._db.on.bind(this._db);
-		this.emit = this._db.emit.bind(this._db);
+		this._useCache = useCache === true;
+
+		this.cache = new ModelsBaseCache(this);
+		// TODO_CACHE: remove
+		this.on = this.cache.on.bind(this.cache);
+		this.emit = this.cache.emit.bind(this.cache);
+		this.getDynamicView = this.cache.getDynamicView.bind(this.cache);
+		this.processQueryOptionsOnResult = this.cache.processQueryOptionsOnResult.bind(this.cache);
+		// END_TODO_CACHE
 
 		this.db = this;
+
+		if (this._useCache) {
+			this.db = new this.constructor(this.model, false);
+		}
+	}
+
+	get useCache() {
+		if (RocketChat.models._CacheControl.get() === false) {
+			return false;
+		}
+
+		return this._useCache;
 	}
 
 	get origin() {
-		return '_db';
+		return this.useCache === true ? 'cache' : '_db';
 	}
 
 	arrayToCursor(data) {
@@ -30,211 +49,98 @@ class ModelsBase {
 			},
 			forEach(fn) {
 				return data.forEach(fn);
-			},
+			}
 		};
 	}
 
-	setUpdatedAt(...args/* record, checkQuery, query*/) {
-		return this._db.setUpdatedAt(...args);
+	setUpdatedAt(/*record, checkQuery, query*/) {
+		return this._db.setUpdatedAt(...arguments);
 	}
 
-	find(...args) {
+	find() {
 		try {
-			return this[this.origin].find(...args);
+			return this[this.origin].find(...arguments);
 		} catch (e) {
-			console.error('Exception on find', e, ...args);
+			console.error('Exception on find', e, ...arguments);
 		}
 	}
 
-	findOne(...args) {
+	findOne() {
 		try {
-			return this[this.origin].findOne(...args);
+			return this[this.origin].findOne(...arguments);
 		} catch (e) {
-			console.error('Exception on find', e, ...args);
+			console.error('Exception on find', e, ...arguments);
 		}
 	}
 
-	findOneById(...args) {
+	findOneById() {
 		try {
-			return this[this.origin].findOneById(...args);
+			return this[this.origin].findOneById(...arguments);
 		} catch (e) {
-			console.error('Exception on find', e, ...args);
+			console.error('Exception on find', e, ...arguments);
 		}
 	}
 
-	findOneByIds(ids, options, ...args) {
+	findOneByIds(ids, options) {
 		check(ids, [String]);
 
 		try {
 			return this[this.origin].findOneByIds(ids, options);
 		} catch (e) {
-			console.error('Exception on find', e, [ids, options, ...args]);
+			console.error('Exception on find', e, ...arguments);
 		}
 	}
 
-	insert(...args/* record*/) {
-		return this._db.insert(...args);
+	insert(/*record*/) {
+		return this._db.insert(...arguments);
 	}
 
-	update(...args/* query, update, options*/) {
-		return this._db.update(...args);
+	update(/*query, update, options*/) {
+		return this._db.update(...arguments);
 	}
 
-	upsert(...args/* query, update*/) {
-		return this._db.upsert(...args);
+	upsert(/*query, update*/) {
+		return this._db.upsert(...arguments);
 	}
 
-	remove(...args/* query*/) {
-		return this._db.remove(...args);
+	remove(/*query*/) {
+		return this._db.remove(...arguments);
 	}
 
-	insertOrUpsert(...args) {
-		return this._db.insertOrUpsert(...args);
+	insertOrUpsert() {
+		return this._db.insertOrUpsert(...arguments);
 	}
 
-	allow(...args) {
-		return this._db.allow(...args);
+	allow() {
+		return this._db.allow(...arguments);
 	}
 
-	deny(...args) {
-		return this._db.deny(...args);
+	deny() {
+		return this._db.deny(...arguments);
 	}
 
-	ensureIndex(...args) {
-		return this._db.ensureIndex(...args);
+	ensureIndex() {
+		return this._db.ensureIndex(...arguments);
 	}
 
-	dropIndex(...args) {
-		return this._db.dropIndex(...args);
+	dropIndex() {
+		return this._db.dropIndex(...arguments);
 	}
 
-	tryEnsureIndex(...args) {
-		return this._db.tryEnsureIndex(...args);
+	tryEnsureIndex() {
+		return this._db.tryEnsureIndex(...arguments);
 	}
 
-	tryDropIndex(...args) {
-		return this._db.tryDropIndex(...args);
+	tryDropIndex() {
+		return this._db.tryDropIndex(...arguments);
 	}
 
-	trashFind(...args/* query, options*/) {
-		return this._db.trashFind(...args);
+	trashFind(/*query, options*/) {
+		return this._db.trashFind(...arguments);
 	}
 
-	trashFindOneById(...args/* _id, options*/) {
-		return this._db.trashFindOneById(...args);
-	}
-
-	trashFindDeletedAfter(...args/* deletedAt, query, options*/) {
-		return this._db.trashFindDeletedAfter(...args);
-	}
-
-	processQueryOptionsOnResult(result, options = {}) {
-		if (result === undefined || result === null) {
-			return undefined;
-		}
-
-		if (Array.isArray(result)) {
-			if (options.sort) {
-				result = result.sort((a, b) => {
-					let r = 0;
-					for (const field in options.sort) {
-						if (options.sort.hasOwnProperty(field)) {
-							const direction = options.sort[field];
-							let valueA;
-							let valueB;
-							if (field.indexOf('.') > -1) {
-								valueA = objectPath.get(a, field);
-								valueB = objectPath.get(b, field);
-							} else {
-								valueA = a[field];
-								valueB = b[field];
-							}
-							if (valueA > valueB) {
-								r = direction;
-								break;
-							}
-							if (valueA < valueB) {
-								r = -direction;
-								break;
-							}
-						}
-					}
-					return r;
-				});
-			}
-
-			if (typeof options.skip === 'number') {
-				result.splice(0, options.skip);
-			}
-
-			if (typeof options.limit === 'number' && options.limit !== 0) {
-				result.splice(options.limit);
-			}
-		}
-
-		if (!options.fields) {
-			options.fields = {};
-		}
-
-		const fieldsToRemove = [];
-		const fieldsToGet = [];
-
-		for (const field in options.fields) {
-			if (options.fields.hasOwnProperty(field)) {
-				if (options.fields[field] === 0) {
-					fieldsToRemove.push(field);
-				} else if (options.fields[field] === 1) {
-					fieldsToGet.push(field);
-				}
-			}
-		}
-
-		if (fieldsToRemove.length > 0 && fieldsToGet.length > 0) {
-			console.warn('Can\'t mix remove and get fields');
-			fieldsToRemove.splice(0, fieldsToRemove.length);
-		}
-
-		if (fieldsToGet.length > 0 && fieldsToGet.indexOf('_id') === -1) {
-			fieldsToGet.push('_id');
-		}
-
-		const pickFields = (obj, fields) => {
-			const picked = {};
-			fields.forEach((field) => {
-				if (field.indexOf('.') !== -1) {
-					objectPath.set(picked, field, objectPath.get(obj, field));
-				} else {
-					picked[field] = obj[field];
-				}
-			});
-			return picked;
-		};
-
-		if (fieldsToRemove.length > 0 || fieldsToGet.length > 0) {
-			if (Array.isArray(result)) {
-				result = result.map((record) => {
-					if (fieldsToRemove.length > 0) {
-						return _.omit(record, ...fieldsToRemove);
-					}
-
-					if (fieldsToGet.length > 0) {
-						return pickFields(record, fieldsToGet);
-					}
-
-					return null;
-				});
-			} else {
-				if (fieldsToRemove.length > 0) {
-					return _.omit(result, ...fieldsToRemove);
-				}
-
-				if (fieldsToGet.length > 0) {
-					return pickFields(result, fieldsToGet);
-				}
-			}
-		}
-
-		return result;
+	trashFindDeletedAfter(/*deletedAt, query, options*/) {
+		return this._db.trashFindDeletedAfter(...arguments);
 	}
 
 	// dinamicTrashFindAfter(method, deletedAt, ...args) {

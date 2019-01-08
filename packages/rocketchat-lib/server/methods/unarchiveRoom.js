@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
-
 Meteor.methods({
 	unarchiveRoom(rid) {
 
@@ -21,5 +18,5 @@ Meteor.methods({
 		}
 
 		return RocketChat.unarchiveRoom(rid);
-	},
+	}
 });

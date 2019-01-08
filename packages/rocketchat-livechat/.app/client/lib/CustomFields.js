@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
 import visitor from '../../imports/client/visitor';
 
 this.CustomFields = (function() {
@@ -31,6 +29,6 @@ this.CustomFields = (function() {
 
 	return {
 		init,
-		setCustomField,
+		setCustomField
 	};
 }());

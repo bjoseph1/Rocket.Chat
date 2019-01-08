@@ -1,10 +1,8 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 class ModelRoles extends RocketChat.models._Base {
-	constructor(...args) {
-		super(...args);
-		this.tryEnsureIndex({ name: 1 });
-		this.tryEnsureIndex({ scope: 1 });
+	constructor() {
+		super(...arguments);
+		this.tryEnsureIndex({ 'name': 1 });
+		this.tryEnsureIndex({ 'scope': 1 });
 	}
 
 	findUsersInRole(name, scope, options) {
@@ -26,7 +24,7 @@ class ModelRoles extends RocketChat.models._Base {
 		});
 	}
 
-	createOrUpdate(name, scope = 'Users', description, protectedRole, mandatory2fa) {
+	createOrUpdate(name, scope = 'Users', description, protectedRole) {
 		const updateData = {};
 		updateData.name = name;
 		updateData.scope = scope;
@@ -37,10 +35,6 @@ class ModelRoles extends RocketChat.models._Base {
 
 		if (protectedRole) {
 			updateData.protected = protectedRole;
-		}
-
-		if (mandatory2fa != null) {
-			updateData.mandatory2fa = mandatory2fa;
 		}
 
 		this.upsert({ _id: name }, { $set: updateData });
@@ -69,18 +63,7 @@ class ModelRoles extends RocketChat.models._Base {
 		}
 		return true;
 	}
-
-	findOneByIdOrName(_idOrName, options) {
-		const query = {
-			$or: [{
-				_id: _idOrName,
-			}, {
-				name: _idOrName,
-			}],
-		};
-
-		return this.findOne(query, options);
-	}
 }
 
-RocketChat.models.Roles = new ModelRoles('roles');
+RocketChat.models.Roles = new ModelRoles('roles', true);
+RocketChat.models.Roles.cache.load();

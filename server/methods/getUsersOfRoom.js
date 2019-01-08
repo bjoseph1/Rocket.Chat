@@ -1,53 +1,40 @@
-import { Meteor } from 'meteor/meteor';
-
 Meteor.methods({
-	async getUsersOfRoom(rid, showAll) {
-		const userId = Meteor.userId();
-		if (!userId) {
+	getUsersOfRoom(roomId, showAll) {
+		if (!Meteor.userId()) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'getUsersOfRoom' });
 		}
 
-		const room = Meteor.call('canAccessRoom', rid, userId);
+		const room = Meteor.call('canAccessRoom', roomId, Meteor.userId());
 		if (!room) {
 			throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'getUsersOfRoom' });
 		}
 
-		if (room.broadcast && !RocketChat.authz.hasPermission(userId, 'view-broadcast-member-list', rid)) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'getUsersOfRoom' });
-		}
+		const filter = (record) => {
+			if (!record._user) {
+				console.log('Subscription without user', record._id);
+				return false;
+			}
 
-		const subscriptions = RocketChat.models.Subscriptions.findByRoomIdWhenUsernameExists(rid);
+			if (showAll === true) {
+				return true;
+			}
+
+			return record._user.status !== 'offline';
+		};
+
+		const map = (record) => {
+			return {
+				_id: record._user._id,
+				username: record._user.username,
+				name: record._user.name
+			};
+		};
+
+		const records = RocketChat.models.Subscriptions.findByRoomId(roomId).fetch();
 
 		return {
-			total: subscriptions.count(),
-			records: await RocketChat.models.Subscriptions.model.rawCollection().aggregate([
-				{ $match: { rid } },
-				{
-					$lookup:
-						{
-							from: 'users',
-							localField: 'u._id',
-							foreignField: '_id',
-							as: 'u',
-						},
-				},
-				{
-					$project: {
-						'u._id': 1,
-						'u.name': 1,
-						'u.username': 1,
-						'u.status': 1,
-					},
-				},
-				...(showAll ? [] : [{ $match: { 'u.status': { $in: ['online', 'away', 'busy'] } } }]),
-				{
-					$project: {
-						_id: { $arrayElemAt: ['$u._id', 0] },
-						name: { $arrayElemAt: ['$u.name', 0] },
-						username: { $arrayElemAt: ['$u.username', 0] },
-					},
-				},
-			]).toArray(),
+			total: records.length,
+			records: records.filter(filter).map(map)
 		};
-	},
+	}
 });

@@ -1,7 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
-import { FileUpload } from 'meteor/rocketchat:file-upload';
-
+/* global FileUpload */
 Meteor.methods({
 	deleteFileMessage(fileID) {
 		check(fileID, String);
@@ -13,5 +10,5 @@ Meteor.methods({
 		}
 
 		return FileUpload.getStore('Uploads').deleteById(fileID);
-	},
+	}
 });

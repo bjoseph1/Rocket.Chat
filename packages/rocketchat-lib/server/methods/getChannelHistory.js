@@ -1,9 +1,7 @@
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
 import _ from 'underscore';
 
 Meteor.methods({
-	getChannelHistory({ rid, latest, oldest, inclusive, count = 20, unreads }) {
+	getChannelHistory({rid, latest, oldest, inclusive, count = 20, unreads}) {
 		check(rid, String);
 
 		if (!Meteor.userId()) {
@@ -16,30 +14,30 @@ Meteor.methods({
 			return false;
 		}
 
-		// Make sure they can access the room
-		if (room.t === 'c' && !RocketChat.authz.hasPermission(fromUserId, 'preview-c-room') && !RocketChat.models.Subscriptions.findOneByRoomIdAndUserId(rid, fromUserId, { fields: { _id: 1 } })) {
+		//Make sure they can access the room
+		if (room.t === 'c' && !RocketChat.authz.hasPermission(fromUserId, 'preview-c-room') && room.usernames.indexOf(room.username) === -1) {
 			return false;
 		}
 
-		// Ensure latest is always defined.
+		//Ensure latest is always defined.
 		if (_.isUndefined(latest)) {
 			latest = new Date();
 		}
 
-		// Verify oldest is a date if it exists
+		//Verify oldest is a date if it exists
 		if (!_.isUndefined(oldest) && !_.isDate(oldest)) {
 			throw new Meteor.Error('error-invalid-date', 'Invalid date', { method: 'getChannelHistory' });
 		}
 
 		const options = {
 			sort: {
-				ts: -1,
+				ts: -1
 			},
-			limit: count,
+			limit: count
 		};
 
 		if (!RocketChat.settings.get('Message_ShowEditedStatus')) {
-			options.fields = { editedAt: 0 };
+			options.fields = { 'editedAt': 0 };
 		}
 
 		let records = [];
@@ -53,7 +51,22 @@ Meteor.methods({
 			records = RocketChat.models.Messages.findVisibleByRoomIdBetweenTimestamps(rid, oldest, latest, options).fetch();
 		}
 
-		const messages = records.map((record) => RocketChat.composeMessageObjectWithUser(record, fromUserId));
+		const UI_Use_Real_Name = RocketChat.settings.get('UI_Use_Real_Name') === true;
+
+		const messages = _.map(records, (message) => {
+			message.starred = _.findWhere(message.starred, { _id: fromUserId });
+			if (message.u && message.u._id && UI_Use_Real_Name) {
+				const user = RocketChat.models.Users.findOneById(message.u._id);
+				message.u.name = user && user.name;
+			}
+			if (message.mentions && message.mentions.length && UI_Use_Real_Name) {
+				message.mentions.forEach((mention) => {
+					const user = RocketChat.models.Users.findOneById(mention._id);
+					mention.name = user && user.name;
+				});
+			}
+			return message;
+		});
 
 		if (unreads) {
 			let unreadNotLoaded = 0;
@@ -71,12 +84,12 @@ Meteor.methods({
 			return {
 				messages: messages || [],
 				firstUnread,
-				unreadNotLoaded,
+				unreadNotLoaded
 			};
 		}
 
 		return {
-			messages: messages || [],
+			messages: messages || []
 		};
-	},
+	}
 });

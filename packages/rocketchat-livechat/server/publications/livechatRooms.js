@@ -1,7 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { Match, check } from 'meteor/check';
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 Meteor.publish('livechat:rooms', function(filter = {}, offset = 0, limit = 20) {
 	if (!this.userId) {
 		return this.error(new Meteor.Error('error-not-authorized', 'Not authorized', { publish: 'livechat:rooms' }));
@@ -16,7 +12,7 @@ Meteor.publish('livechat:rooms', function(filter = {}, offset = 0, limit = 20) {
 		agent: Match.Maybe(String), // agent _id who is serving
 		status: Match.Maybe(String), // either 'opened' or 'closed'
 		from: Match.Maybe(Date),
-		to: Match.Maybe(Date),
+		to: Match.Maybe(Date)
 	});
 
 	const query = {};
@@ -35,7 +31,7 @@ Meteor.publish('livechat:rooms', function(filter = {}, offset = 0, limit = 20) {
 	}
 	if (filter.from) {
 		query.ts = {
-			$gte: filter.from,
+			$gte: filter.from
 		};
 	}
 	if (filter.to) {
@@ -59,7 +55,7 @@ Meteor.publish('livechat:rooms', function(filter = {}, offset = 0, limit = 20) {
 		},
 		removed(id) {
 			self.removed('livechatRoom', id);
-		},
+		}
 	});
 
 	this.ready();

@@ -1,5 +1,3 @@
-import { RocketChat } from 'meteor/rocketchat:lib';
-
 RocketChat.settings.addGroup('General', function() {
 	this.section('GraphQL API', function() {
 		this.add('Graphql_Enabled', false, { type: 'boolean', public: false });

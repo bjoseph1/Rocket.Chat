@@ -1,3 +1,1 @@
-import { Mongo } from 'meteor/mongo';
-
-export const LivechatQueueUser = new Mongo.Collection('livechatQueueUser');
+this.LivechatQueueUser = new Mongo.Collection('livechatQueueUser');

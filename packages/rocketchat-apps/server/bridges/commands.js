@@ -1,6 +1,4 @@
-import { Meteor } from 'meteor/meteor';
-import { SlashCommandContext } from '@rocket.chat/apps-engine/definition/slashcommands';
-import { Utilities } from '../../lib/misc/Utilities';
+import { SlashCommandContext } from '@rocket.chat/apps-ts-definition/slashcommands';
 
 export class AppCommandsBridge {
 	constructor(orch) {
@@ -75,9 +73,6 @@ export class AppCommandsBridge {
 		item.params = command.paramsExample ? command.paramsExample : item.params;
 		item.description = command.i18nDescription ? command.i18nDescription : item.params;
 		item.callback = this._appCommandExecutor.bind(this);
-		item.providesPreview = command.providesPreview;
-		item.previewer = command.previewer ? this._appCommandPreviewer.bind(this) : item.previewer;
-		item.previewCallback = command.executePreviewItem ? this._appCommandPreviewExecutor.bind(this) : item.previewCallback;
 
 		RocketChat.slashCommands.commands[cmd] = item;
 		this.orch.getNotifier().commandUpdated(cmd);
@@ -90,12 +85,9 @@ export class AppCommandsBridge {
 
 		const item = {
 			command: command.command.toLowerCase(),
-			params: Utilities.getI18nKeyForApp(command.i18nParamsExample, appId),
-			description: Utilities.getI18nKeyForApp(command.i18nDescription, appId),
-			callback: this._appCommandExecutor.bind(this),
-			providesPreview: command.providesPreview,
-			previewer: !command.previewer ? undefined : this._appCommandPreviewer.bind(this),
-			previewCallback: !command.executePreviewItem ? undefined : this._appCommandPreviewExecutor.bind(this),
+			params: command.paramsExample,
+			description: command.i18nDescription,
+			callback: this._appCommandExecutor.bind(this)
 		};
 
 		RocketChat.slashCommands.commands[command.command.toLowerCase()] = item;
@@ -125,15 +117,11 @@ export class AppCommandsBridge {
 			throw new Error('Invalid Slash Command parameter provided, it must be a valid ISlashCommand object.');
 		}
 
-		if (command.i18nParamsExample && typeof command.i18nParamsExample !== 'string') {
+		if (command.paramsExample && typeof command.paramsExample !== 'string') {
 			throw new Error('Invalid Slash Command parameter provided, it must be a valid ISlashCommand object.');
 		}
 
 		if (command.i18nDescription && typeof command.i18nDescription !== 'string') {
-			throw new Error('Invalid Slash Command parameter provided, it must be a valid ISlashCommand object.');
-		}
-
-		if (typeof command.providesPreview !== 'boolean') {
 			throw new Error('Invalid Slash Command parameter provided, it must be a valid ISlashCommand object.');
 		}
 
@@ -148,24 +136,6 @@ export class AppCommandsBridge {
 		const params = parameters.length === 0 || parameters === ' ' ? [] : parameters.split(' ');
 
 		const context = new SlashCommandContext(Object.freeze(user), Object.freeze(room), Object.freeze(params));
-		Promise.await(this.orch.getManager().getCommandManager().executeCommand(command, context));
-	}
-
-	_appCommandPreviewer(command, parameters, message) {
-		const user = this.orch.getConverters().get('users').convertById(Meteor.userId());
-		const room = this.orch.getConverters().get('rooms').convertById(message.rid);
-		const params = parameters.length === 0 || parameters === ' ' ? [] : parameters.split(' ');
-
-		const context = new SlashCommandContext(Object.freeze(user), Object.freeze(room), Object.freeze(params));
-		return Promise.await(this.orch.getManager().getCommandManager().getPreviews(command, context));
-	}
-
-	_appCommandPreviewExecutor(command, parameters, message, preview) {
-		const user = this.orch.getConverters().get('users').convertById(Meteor.userId());
-		const room = this.orch.getConverters().get('rooms').convertById(message.rid);
-		const params = parameters.length === 0 || parameters === ' ' ? [] : parameters.split(' ');
-
-		const context = new SlashCommandContext(Object.freeze(user), Object.freeze(room), Object.freeze(params));
-		Promise.await(this.orch.getManager().getCommandManager().executePreview(command, preview, context));
+		this.orch.getManager().getCommandManager().executeCommand(command, context);
 	}
 }
