@@ -1,10 +1,11 @@
 import { Meteor } from 'meteor/meteor';
-import { roomTypes } from 'meteor/rocketchat:utils';
-import { hasPermission } from 'meteor/rocketchat:authorization';
-import { Rooms, Subscriptions } from 'meteor/rocketchat:models';
-import { settings } from 'meteor/rocketchat:settings';
-import { Notifications } from 'meteor/rocketchat:notifications';
 import _ from 'underscore';
+
+import { roomTypes } from '../../app/utils';
+import { hasPermission } from '../../app/authorization';
+import { Rooms, Subscriptions } from '../../app/models';
+import { settings } from '../../app/settings';
+import { Notifications } from '../../app/notifications';
 
 const fields = {
 	_id: 1,
@@ -18,6 +19,7 @@ const fields = {
 	announcement: 1,
 	announcementDetails: 1,
 	muted: 1,
+	unmuted: 1,
 	_updatedAt: 1,
 	archived: 1,
 	jitsiTimeout: 1,
@@ -48,6 +50,7 @@ const fields = {
 	encrypted: 1,
 	e2eKeyId: 1,
 	departmentId: 1,
+	servedBy: 1,
 };
 
 const roomMap = (record) => {
